@@ -4,11 +4,1232 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>GOV.UK Prototype Builder</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+/* Builder interface */
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #f3f2f1;
+  --pn: #fff;
+  --ink: #0b0c0c;
+  --mut: #505a5f;
+  --ln: #b1b4b6;
+  --bl: #1d70b8;
+  --fc: #ffdd00;
+}
+
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1d1f20;
+    --pn: #2a2d2e;
+    --ink: #f3f2f1;
+    --mut: #b1b4b6;
+    --ln: #505a5f;
+    --bl: #5694ca;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #1d1f20;
+  --pn: #2a2d2e;
+  --ink: #f3f2f1;
+  --mut: #b1b4b6;
+  --ln: #505a5f;
+  --bl: #5694ca;
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.4 Arial, Helvetica, sans-serif;
+}
+
+header {
+  background: #0b0c0c;
+  color: #fff;
+  padding: 10px 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  border-bottom: 10px solid var(--bl);
+  flex-wrap: wrap;
+}
+
+header b {
+  font-size: 20px;
+}
+
+header span {
+  color: #b1b4b6;
+  font-size: 14px;
+}
+
+.app {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr) 360px;
+  gap: 16px;
+  padding: 16px;
+  align-items: start;
+}
+
+@media(max-width:1000px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+}
+
+.col {
+  background: var(--pn);
+  border: 1px solid var(--ln);
+  padding: 12px;
+}
+
+h2 {
+  font-size: 16px;
+  margin: 12px 0 6px;
+}
+
+h2:first-child {
+  margin-top: 0;
+}
+
+.pal {
+  border: 1px solid var(--ln);
+  padding: 8px 10px;
+  margin: 0 0 6px;
+  cursor: grab;
+  background: var(--pn);
+  font-weight: 700;
+  user-select: none;
+}
+
+.pal:hover {
+  border-color: var(--bl);
+  color: var(--bl);
+}
+
+.pal:focus,
+.btn:focus,
+.tab:focus,
+.it:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 3px solid var(--fc);
+  outline-offset: 0;
+}
+
+.hint {
+  color: var(--mut);
+  font-size: 14px;
+}
+
+#cv {
+  min-height: 420px;
+  padding: 0;
+}
+
+.page {
+  background: #fff;
+  color: #0b0c0c;
+  min-height: 420px;
+  padding: 24px 20px 40px;
+}
+
+.page .in {
+  max-width: 640px;
+}
+
+.it {
+  position: relative;
+  cursor: grab;
+  border: 2px solid transparent;
+  margin: 0 -6px;
+  padding: 0 4px;
+}
+
+.it:hover {
+  border-color: #b1b4b6;
+}
+
+.it.sel {
+  border-color: var(--bl);
+}
+
+.it .pv {
+  pointer-events: none;
+}
+
+.it.dropb:before,
+#cv.drope .page:after {
+  content: "";
+  display: block;
+  height: 4px;
+  background: var(--bl);
+  margin: 0 -4px;
+}
+
+.it.dropb:before {
+  position: absolute;
+  top: -4px;
+  left: 0;
+  right: 0;
+}
+
+#cv.drope .page:after {
+  margin-top: 8px;
+}
+
+.empty {
+  color: #505a5f;
+  border: 2px dashed #b1b4b6;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--ln);
+  margin: -12px -12px 12px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 4px;
+  background: none;
+  border: 0;
+  border-bottom: 4px solid transparent;
+  color: var(--ink);
+  font: 700 14px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.tab[aria-selected=true] {
+  border-bottom-color: var(--bl);
+  color: var(--bl);
+}
+
+label.f {
+  display: block;
+  font-weight: 700;
+  margin: 10px 0 4px;
+  font-size: 14px;
+}
+
+.fld {
+  width: 100%;
+  padding: 6px;
+  border: 2px solid var(--ink);
+  background: var(--pn);
+  color: var(--ink);
+  font: 16px Arial, sans-serif;
+  border-radius: 0;
+}
+
+.row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.btn {
+  background: var(--bl);
+  color: #fff;
+  border: 0;
+  padding: 7px 12px;
+  font: 700 14px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.btn.s {
+  background: var(--pn);
+  color: var(--ink);
+  border: 2px solid var(--ln);
+}
+
+.btn.d {
+  background: #d4351c;
+  color: #fff;
+}
+
+pre,
+#out {
+  width: 100%;
+  height: 480px;
+  font: 12px/1.5 Consolas, Menlo, monospace;
+  background: #0b0c0c;
+  color: #f3f2f1;
+  border: 0;
+  padding: 10px;
+  overflow: auto;
+  resize: vertical;
+}
+
+/* GOV.UK-style preview */
+.gv-h1 {
+  font: 700 48px/1.1 Arial, sans-serif;
+  margin: 0 0 30px;
+}
+
+.govuk-heading-xl {
+  font: 700 48px/1.1 Arial, sans-serif;
+  margin: 0 0 30px;
+}
+
+.govuk-heading-l {
+  font: 700 36px/1.1 Arial, sans-serif;
+  margin: 0 0 20px;
+}
+
+.govuk-heading-m {
+  font: 700 24px/1.2 Arial, sans-serif;
+  margin: 0 0 20px;
+}
+
+.govuk-body {
+  font: 19px/1.3 Arial, sans-serif;
+  margin: 0 0 20px;
+}
+
+.govuk-inset-text {
+  border-left: 10px solid #b1b4b6;
+  padding: 15px;
+  margin: 30px 0;
+  font-size: 19px;
+}
+
+.govuk-warning-text {
+  margin: 30px 0;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  font-size: 19px;
+}
+
+.govuk-warning-text__icon {
+  flex: none;
+  width: 35px;
+  height: 35px;
+  border: 3px solid #0b0c0c;
+  border-radius: 50%;
+  text-align: center;
+  font: 700 30px/29px Arial;
+}
+
+.govuk-visually-hidden {
+  position: absolute;
+  left: -9999px;
+}
+
+.govuk-button {
+  background: #00703c;
+  color: #fff;
+  border: 0;
+  box-shadow: 0 2px 0 #002d18;
+  padding: 8px 10px 7px;
+  font: 19px Arial, sans-serif;
+  margin: 0 0 22px;
+}
+
+.govuk-form-group {
+  margin-bottom: 30px;
+}
+
+.govuk-label {
+  display: block;
+  font: 19px Arial;
+  margin-bottom: 5px;
+}
+
+.govuk-label--s,
+.govuk-fieldset__legend--s {
+  font-weight: 700;
+}
+
+.govuk-label--m,
+.govuk-fieldset__legend--m {
+  font: 700 24px Arial;
+}
+
+.govuk-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.govuk-fieldset__legend {
+  margin-bottom: 15px;
+}
+
+.govuk-hint {
+  color: #505a5f;
+  font-size: 19px;
+  margin-bottom: 15px;
+}
+
+.govuk-input,
+.govuk-textarea,
+.govuk-select {
+  display: block;
+  width: 100%;
+  border: 2px solid #0b0c0c;
+  padding: 5px;
+  font: 19px Arial;
+  height: 40px;
+  border-radius: 0;
+  background: #fff;
+  color: #0b0c0c;
+}
+
+.govuk-textarea {
+  height: 110px;
+}
+
+.govuk-select {
+  width: auto;
+  min-width: 200px;
+}
+
+.govuk-radios__item,
+.govuk-checkboxes__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 19px;
+}
+
+.govuk-radios__input,
+.govuk-checkboxes__input {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  border: 2px solid #0b0c0c;
+  flex: none;
+}
+
+.govuk-details__summary {
+  color: #1d70b8;
+  text-decoration: underline;
+  font-size: 19px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.govuk-details__text {
+  border-left: 5px solid #b1b4b6;
+  padding: 15px;
+  font-size: 19px;
+  margin-bottom: 20px;
+}
+
+.govuk-notification-banner {
+  border: 5px solid #1d70b8;
+  background: #1d70b8;
+  margin-bottom: 30px;
+}
+
+.govuk-notification-banner__title {
+  color: #fff;
+  font: 700 19px Arial;
+  margin: 0;
+  padding: 2px 20px 5px;
+}
+
+.govuk-notification-banner__content {
+  background: #fff;
+  padding: 20px;
+  font-size: 19px;
+}
+
+.govuk-notification-banner__heading {
+  font: 700 19px Arial;
+  margin: 0;
+}
+
+.govuk-back-link {
+  display: inline-block;
+  color: #0b0c0c;
+  font-size: 16px;
+  margin: 0 0 20px;
+  padding-left: 14px;
+  border-left: 0;
+  text-decoration: underline;
+}
+
+.govuk-tag {
+  display: inline-block;
+  font: 700 16px/1 Arial;
+  text-transform: uppercase;
+  padding: 5px 8px 4px;
+  margin-bottom: 20px;
+  color: #1d70b8;
+  background: #d2e2f1;
+}
+
+.govuk-tag--grey {
+  color: #282d30;
+  background: #e5e6e7;
+}
+
+.govuk-tag--green {
+  color: #005a30;
+  background: #cce2d8;
+}
+
+.govuk-tag--red {
+  color: #942514;
+  background: #f6d7d2;
+}
+
+.govuk-tag--yellow {
+  color: #594d00;
+  background: #fff7bf;
+}
+
+.govuk-accordion__section {
+  border-top: 1px solid #b1b4b6;
+  padding: 10px 0;
+}
+
+.govuk-accordion__section-button {
+  color: #1d70b8;
+  font: 700 19px Arial;
+  display: block;
+}
+
+.govuk-accordion__section-heading {
+  margin: 0;
+}
+
+.govuk-accordion__section-content {
+  padding-top: 10px;
+}
+
+.govuk-breadcrumbs__list {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  gap: 10px;
+  font-size: 16px;
+}
+
+.govuk-breadcrumbs__link {
+  color: #0b0c0c;
+}
+
+.govuk-breadcrumbs__list-item+.govuk-breadcrumbs__list-item:before {
+  content: "›";
+  margin-right: 10px;
+}
+
+.govuk-character-count .govuk-hint {
+  margin: 5px 0 0;
+  font-size: 16px;
+}
+
+.govuk-cookie-banner {
+  background: #f3f2f1;
+  padding: 20px;
+  margin: -24px -20px 20px;
+}
+
+.govuk-button-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.govuk-button-group .govuk-button {
+  margin: 0;
+}
+
+.govuk-date-input {
+  display: flex;
+  gap: 20px;
+}
+
+.govuk-date-input .govuk-form-group {
+  margin: 0;
+}
+
+.govuk-input--width-2 {
+  width: 54px;
+}
+
+.govuk-input--width-4 {
+  width: 90px;
+}
+
+.govuk-error-message {
+  color: #d4351c;
+  font: 700 19px Arial;
+  margin: 0 0 15px;
+}
+
+.govuk-error-summary {
+  border: 5px solid #d4351c;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.govuk-error-summary__title {
+  font: 700 24px Arial;
+  margin: 0 0 15px;
+}
+
+.govuk-error-summary__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font: 700 19px Arial;
+}
+
+.govuk-error-summary__list a {
+  color: #d4351c;
+}
+
+.govuk-button--warning {
+  background: #d4351c;
+  box-shadow: 0 2px 0 #55150b;
+  display: inline-block;
+}
+
+.govuk-file-upload {
+  font: 19px Arial;
+}
+
+.govuk-link {
+  color: #1d70b8;
+}
+
+.govuk-footer {
+  background: #f3f2f1;
+  border-top: 1px solid #b1b4b6;
+  padding: 25px 20px;
+  margin: 24px -20px -40px;
+}
+
+.govuk-footer__inline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 16px;
+}
+
+.govuk-footer a {
+  color: #0b0c0c;
+}
+
+.govuk-header {
+  background: #0b0c0c;
+  border-bottom: 10px solid #1d70b8;
+  margin: -24px -20px 20px;
+  padding: 10px 20px;
+}
+
+.govuk-header__logotype-text {
+  color: #fff;
+  font: 700 30px Arial;
+}
+
+.govuk-pagination {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 30px;
+  font-size: 19px;
+}
+
+.govuk-pagination__list {
+  list-style: none;
+  display: flex;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.govuk-pagination__item--current {
+  background: #1d70b8;
+}
+
+.govuk-pagination__item--current a {
+  color: #fff;
+}
+
+.govuk-pagination__link {
+  padding: 0 8px;
+  display: block;
+}
+
+.govuk-panel {
+  background: #00703c;
+  color: #fff;
+  text-align: center;
+  padding: 35px;
+  margin-bottom: 30px;
+}
+
+.govuk-panel__title {
+  font: 700 48px Arial;
+  margin: 0 0 30px;
+}
+
+.govuk-panel__body {
+  font-size: 32px;
+}
+
+.govuk-password-input__toggle {
+  display: none;
+}
+
+.govuk-input__wrapper {
+  display: flex;
+}
+
+.govuk-phase-banner {
+  border-bottom: 1px solid #b1b4b6;
+  padding: 10px 0;
+  margin-bottom: 20px;
+}
+
+.govuk-phase-banner__content {
+  margin: 0;
+  font-size: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.govuk-phase-banner__content .govuk-tag {
+  margin: 0;
+}
+
+.govuk-service-navigation {
+  background: #f3f2f1;
+  border-bottom: 1px solid #b1b4b6;
+  margin: -24px -20px 20px;
+  padding: 12px 20px;
+}
+
+.govuk-service-navigation__container {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.govuk-service-navigation__list {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+}
+
+.govuk-service-navigation__link {
+  color: #0b0c0c;
+  font: 700 19px Arial;
+}
+
+.govuk-service-navigation__item .govuk-service-navigation__link {
+  font-weight: 400;
+}
+
+.govuk-skip-link {
+  color: #1d70b8;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.govuk-summary-list {
+  margin: 0 0 30px;
+  font-size: 19px;
+}
+
+.govuk-summary-list__row {
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid #b1b4b6;
+  padding: 10px 0;
+}
+
+.govuk-summary-list__key {
+  width: 30%;
+  font-weight: 700;
+}
+
+.govuk-summary-list__value {
+  margin: 0;
+  flex: 1;
+}
+
+.govuk-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 30px;
+  font-size: 19px;
+}
+
+.govuk-table th,
+.govuk-table td {
+  text-align: left;
+  padding: 10px 20px 10px 0;
+  border-bottom: 1px solid #b1b4b6;
+}
+
+.govuk-table__caption--m {
+  font: 700 24px Arial;
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.govuk-tabs__title {
+  display: none;
+}
+
+.govuk-tabs__list {
+  list-style: none;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid #b1b4b6;
+}
+
+.govuk-tabs__tab {
+  display: block;
+  padding: 10px 20px;
+  background: #f3f2f1;
+  color: #0b0c0c;
+  font-size: 19px;
+}
+
+.govuk-tabs__list-item--selected .govuk-tabs__tab {
+  background: #fff;
+  border: 1px solid #b1b4b6;
+  border-bottom-color: #fff;
+  margin-bottom: -1px;
+}
+
+.govuk-tabs__panel {
+  padding: 30px 20px;
+  border: 1px solid #b1b4b6;
+  border-top: 0;
+  margin-bottom: 30px;
+}
+
+.govuk-tabs__panel--hidden {
+  display: none;
+}
+
+.govuk-task-list {
+  list-style: none;
+  margin: 0 0 30px;
+  padding: 0;
+  font-size: 19px;
+}
+
+.govuk-task-list__item {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #b1b4b6;
+  padding: 10px 0;
+}
+
+.govuk-task-list .govuk-tag {
+  margin: 0;
+}
+
+.pal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.gl {
+  flex: none;
+  color: var(--bl);
+  text-decoration: none;
+  border: 1px solid var(--ln);
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  font-size: 13px;
+  line-height: 20px;
+  border-radius: 50%;
+}
+
+.gl:hover,
+.gl:focus {
+  background: var(--bl);
+  color: #fff;
+  outline: 3px solid var(--fc);
+}
+
+.gdl {
+  color: var(--bl);
+}
+
+.pbar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.pg {
+  background: var(--pn);
+  color: var(--ink);
+  border: 1px solid var(--ln);
+  padding: 6px 12px;
+  font: 700 14px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.pg.on {
+  background: var(--bl);
+  color: #fff;
+  border-color: var(--bl);
+}
+
+.pg.add {
+  border-style: dashed;
+  color: var(--bl);
+}
+
+.pg:focus {
+  outline: 3px solid var(--fc);
+}
+
+/* Flow view */
+[hidden] {
+  display: none !important;
+}
+
+.pg.seg {
+  border-radius: 0;
+}
+
+#flow {
+  padding: 0;
+  height: 640px;
+  overflow: auto;
+  background-image: radial-gradient(var(--ln) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.flow-help {
+  position: sticky;
+  left: 0;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--mut);
+}
+
+.flow-board {
+  position: relative;
+  min-width: 100%;
+}
+
+.flow-wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.wire {
+  fill: none;
+  stroke-width: 2.5;
+}
+
+.wire.next {
+  stroke: var(--bl);
+}
+
+.wire.branch {
+  stroke: #f47738;
+}
+
+.wire.temp {
+  stroke: var(--mut);
+  stroke-dasharray: 5 4;
+}
+
+.arrow-next {
+  fill: var(--bl);
+}
+
+.arrow-branch {
+  fill: #f47738;
+}
+
+.cut {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.cut circle {
+  fill: var(--pn);
+  stroke: var(--ln);
+}
+
+.cut text {
+  fill: var(--ink);
+  font: 700 13px Arial, sans-serif;
+  text-anchor: middle;
+}
+
+.fcard {
+  position: absolute;
+  background: var(--pn);
+  border: 2px solid var(--ln);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.fcard.on {
+  border-color: var(--bl);
+}
+
+.fcard.drop {
+  outline: 3px solid var(--fc);
+}
+
+.fcard-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--bg);
+}
+
+.fcard-body {
+  padding: 8px;
+  font-size: 14px;
+}
+
+.fcard-body .hint {
+  display: block;
+}
+
+.fport {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0 4px 8px;
+  font-size: 13px;
+  border-top: 1px solid var(--ln);
+}
+
+.port,
+.inport {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--pn);
+  background: var(--bl);
+}
+
+.port {
+  margin-right: -10px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.inport {
+  position: absolute;
+  left: -10px;
+  top: 14px;
+  background: var(--ink);
+}
+
+/* Export tab */
+.tabs .tab {
+  font-size: 13px;
+  padding: 10px 2px;
+}
+
+.filelist {
+  margin: 8px 0 12px;
+  padding-left: 18px;
+  font: 12px/1.6 Consolas, Menlo, monospace;
+}
+
+#sb details {
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+#sb summary {
+  cursor: pointer;
+  color: var(--bl);
+}
+
+/* HMRC components */
+.govuk-input--width-10 {
+  width: 23ex;
+}
+
+.govuk-input__prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 2px solid #0b0c0c;
+  border-right: 0;
+  background: #f3f2f1;
+  font: 19px Arial, sans-serif;
+}
+
+.hmrc-banner {
+  margin: 0 0 20px;
+  padding: 8px 12px;
+  border-left: 10px solid #28a197;
+  border-bottom: 1px solid #b1b4b6;
+}
+
+.hmrc-banner p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.hmrc-internal-header {
+  margin: -24px -20px 20px;
+  padding: 10px 16px;
+  background: #0b0c0c;
+  border-left: 10px solid #28a197;
+  border-bottom: 10px solid #00703c;
+  color: #fff;
+  font: 700 18px Arial, sans-serif;
+}
+
+.hmrc-internal-header a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.hmrc-notification-badge {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: #d4351c;
+  color: #fff;
+  font: 700 14px Arial, sans-serif;
+}
+
+.govuk-caption-l {
+  margin: 0 0 5px;
+  font: 19px Arial, sans-serif;
+  color: #505a5f;
+}
+
+.hmrc-timeline {
+  list-style: none;
+  margin: 0 0 30px;
+  padding: 0;
+  border-left: 5px solid #b1b4b6;
+}
+
+.hmrc-timeline__event {
+  padding: 0 0 20px 20px;
+}
+
+.hmrc-timeline__event-title {
+  margin: 0;
+  font: 700 19px Arial, sans-serif;
+}
+
+.hmrc-timeline__event-meta {
+  display: block;
+  margin: 4px 0;
+  color: #505a5f;
+  font-size: 16px;
+}
+
+.hmrc-user-research-banner {
+  margin: 0 -20px 20px;
+  padding: 12px 20px;
+  background: #f3f2f1;
+  border-bottom: 1px solid #b1b4b6;
+}
+
+.hmrc-user-research-banner__container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.hmrc-user-research-banner__title {
+  margin: 0 0 4px;
+  font: 700 19px Arial, sans-serif;
+}
+
+.hmrc-user-research-banner .govuk-button {
+  margin: 0;
+}
+
+/* Preview view */
+#preview {
+  padding: 0;
+}
+
+.pv-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ln);
+}
+
+.pv-data {
+  padding: 8px 12px;
+  border-top: 1px solid var(--ln);
+  font-size: 14px;
+}
+
+.pv-data pre {
+  height: auto;
+  max-height: 200px;
+  margin: 8px 0 0;
+  white-space: pre-wrap;
+}
+  </style>
 </head>
 <body>
   <header>
     <b>GOV.UK Prototype Builder</b>
+    <span>Drag components onto the page, add pages, then copy the Nunjucks and routes into your Prototype Kit app.</span>
   </header>
 
   <div class="app">
@@ -24,6 +1245,7 @@
         </div>
       </div>
       <div class="col" id="flow" hidden></div>
+      <div class="col" id="preview" hidden></div>
     </div>
 
     <!-- Right: properties and generated code -->
@@ -39,8 +1261,1334 @@
     </div>
   </div>
 
-  <script src="flow.js"></script>
-  <script src="export.js"></script>
-  <script src="app.js"></script>
+  <script>
+// ---------- Flow view: screens as cards, wired together with arrows ----------
+// Loaded before app.js. It reads and writes the same page data as the editor:
+//   page.next          the screen to go to after the form is submitted
+//   page.branch[key]   the screen to go to for one radio answer ("name=value")
+//   page.x, page.y     the card's position on the flow board
+
+const CARD_W = 220;
+const FLOW_HELP = 'Drag a card to move it. Drag from a blue dot onto another screen to connect them. Click \u00d7 on an arrow to remove it.';
+let flowMessage = '';
+let flowDrag = null; // the card or wire currently being dragged
+
+const pageById = id => state.pages.find(p => p.id === id);
+const targetOf = (page, key) => key === '' ? page.next : (page.branch || {})[key] || '';
+
+// The output ports of a page: a default "next" port, plus one per radio option.
+function outputPorts(page) {
+    const radios = page.items.filter(i => i.t === 'radios');
+    const ports = [{ key: '', label: radios.length ? 'Otherwise' : 'Next screen' }];
+    radios.forEach(r => splitLines(r.p.options).forEach(option => {
+        ports.push({ key: r.p.name + '=' + slugify(option), label: 'If ' + option });
+    }));
+    return ports;
+}
+
+function placeNewCards() {
+    state.pages.forEach((p, i) => {
+        if (p.x == null) {
+            p.x = 30 + (i % 3) * 270;
+            p.y = 30 + Math.floor(i / 3) * 240;
+        }
+    });
+}
+
+function cardHtml(page, index) {
+    const ports = outputPorts(page).map(port => `
+        <div class="fport">
+            <span>${escapeHtml(port.label)}</span>
+            <i class="port" data-src="${page.id}" data-key="${escapeHtml(port.key)}" title="Drag to another screen"></i>
+        </div>`).join('');
+    return `
+        <div class="fcard${index === state.cur ? ' on' : ''}" data-card="${page.id}" style="left:${page.x}px;top:${page.y}px;width:${CARD_W}px">
+            <i class="inport" data-in="${page.id}"></i>
+            <div class="fcard-head"><b>/${escapeHtml(page.name)}</b><button class="btn s" data-edit="${index}">Edit</button></div>
+            <div class="fcard-body">${escapeHtml(page.title)}<span class="hint">${page.items.length} components</span></div>
+            ${ports}
+        </div>`;
+}
+
+function renderFlow() {
+    const flowEl = $('#flow');
+    const active = state.view === 'flow';
+    flowEl.hidden = !active;
+    $('#cv').hidden = (state.view || 'page') !== 'page';
+    if (!active) return;
+    placeNewCards();
+    const width = Math.max(...state.pages.map(p => p.x)) + CARD_W + 80;
+    const height = Math.max(...state.pages.map(p => p.y)) + 300;
+    flowEl.innerHTML = `
+        <p class="flow-help" role="status">${escapeHtml(flowMessage || FLOW_HELP)}</p>
+        <div class="flow-board" id="board" style="width:${width}px;height:${height}px">
+            <svg class="flow-wires" id="wires"></svg>
+            ${state.pages.map(cardHtml).join('')}
+        </div>`;
+    drawWires();
+}
+
+// Position of an element's centre, relative to the flow board.
+function centreOf(el, board) {
+    const b = board.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    return [r.left + r.width / 2 - b.left, r.top + r.height / 2 - b.top];
+}
+
+const curve = ([x1, y1], [x2, y2]) => `M${x1},${y1} C${x1 + 70},${y1} ${x2 - 70},${y2} ${x2 - 8},${y2}`;
+
+function drawWires() {
+    const board = $('#board');
+    if (!board) return;
+    let svg = `<defs>
+        <marker id="arrow-next" class="arrow-next" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker>
+        <marker id="arrow-branch" class="arrow-branch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>`;
+    state.pages.forEach(page => outputPorts(page).forEach(port => {
+        const target = targetOf(page, port.key);
+        const from = board.querySelector(`.port[data-src="${page.id}"][data-key="${port.key}"]`);
+        const to = target && board.querySelector(`.inport[data-in="${target}"]`);
+        if (!from || !to) return;
+        const a = centreOf(from, board), b = centreOf(to, board);
+        const kind = port.key === '' ? 'next' : 'branch';
+        svg += `<path class="wire ${kind}" d="${curve(a, b)}" marker-end="url(#arrow-${kind})"/>
+            <g class="cut" data-cut-src="${page.id}" data-cut-key="${escapeHtml(port.key)}" transform="translate(${(a[0] + b[0]) / 2},${(a[1] + b[1]) / 2})">
+                <title>Remove this connection</title><circle r="9"/><text y="4">\u00d7</text>
+            </g>`;
+    }));
+    $('#wires').innerHTML = svg + '<path id="tempwire" class="wire temp"/>';
+}
+
+function connect(srcId, key, targetId) {
+    const src = pageById(srcId);
+    if (key === '') src.next = targetId;
+    else (src.branch = src.branch || {})[key] = targetId;
+    if (hasForm(src.items)) {
+        flowMessage = '';
+    } else {
+        src.items.push(createItem('button')); // a screen needs a button to submit to the next one
+        flowMessage = `Added a Continue button to /${src.name} so it can move on to the next screen.`;
+    }
+}
+
+function disconnect(srcId, key) {
+    const src = pageById(srcId);
+    if (key === '') src.next = '';
+    else delete (src.branch || {})[key];
+    flowMessage = '';
+}
+
+// ----- Dragging cards and wires (pointer events work for mouse and touch) -----
+document.addEventListener('pointerdown', ev => {
+    const board = $('#board');
+    if (!board || $('#flow').hidden) return;
+    const port = ev.target.closest('.port');
+    const card = ev.target.closest('.fcard');
+    if (port) {
+        flowDrag = { type: 'wire', src: port.dataset.src, key: port.dataset.key, from: centreOf(port, board) };
+        ev.preventDefault();
+    } else if (card && !ev.target.closest('button')) {
+        const page = pageById(card.dataset.card);
+        flowDrag = { type: 'card', page, el: card, startX: ev.clientX, startY: ev.clientY, x: page.x, y: page.y, moved: false };
+        ev.preventDefault();
+    }
+});
+
+document.addEventListener('pointermove', ev => {
+    if (!flowDrag) return;
+    const board = $('#board');
+    if (flowDrag.type === 'card') {
+        const d = flowDrag;
+        const dx = ev.clientX - d.startX, dy = ev.clientY - d.startY;
+        if (Math.abs(dx) + Math.abs(dy) > 3) d.moved = true;
+        d.page.x = Math.max(0, d.x + dx);
+        d.page.y = Math.max(0, d.y + dy);
+        d.el.style.left = d.page.x + 'px';
+        d.el.style.top = d.page.y + 'px';
+        drawWires();
+    } else {
+        const b = board.getBoundingClientRect();
+        $('#tempwire').setAttribute('d', curve(flowDrag.from, [ev.clientX - b.left + 8, ev.clientY - b.top]));
+        const over = document.elementFromPoint(ev.clientX, ev.clientY);
+        document.querySelectorAll('.fcard.drop').forEach(c => c.classList.remove('drop'));
+        const card = over && over.closest('.fcard');
+        if (card && card.dataset.card !== flowDrag.src) card.classList.add('drop');
+    }
+});
+
+document.addEventListener('pointerup', ev => {
+    if (!flowDrag) return;
+    const d = flowDrag;
+    flowDrag = null;
+    if (d.type === 'wire') {
+        const over = document.elementFromPoint(ev.clientX, ev.clientY);
+        const card = over && over.closest('.fcard');
+        if (card && card.dataset.card !== d.src) connect(d.src, d.key, card.dataset.card);
+        renderFlow();
+        renderSidebar();
+        saveState();
+    } else if (d.moved) {
+        saveState();
+    } else {
+        goPage(state.pages.indexOf(d.page)); // a click selects the screen
+    }
+});
+
+document.addEventListener('click', ev => {
+    const view = ev.target.closest('[data-view]');
+    const edit = ev.target.closest('[data-edit]');
+    const cut = ev.target.closest('[data-cut-src]');
+    if (view) {
+        state.view = view.dataset.view;
+        renderAll();
+    } else if (edit) {
+        state.view = 'page';
+        goPage(+edit.dataset.edit);
+    } else if (cut) {
+        disconnect(cut.dataset.cutSrc, cut.dataset.cutKey);
+        renderFlow();
+        renderSidebar();
+        saveState();
+    } else if (ev.target.closest('[data-tidy]')) {
+        state.pages.forEach(p => { p.x = null; });
+        renderFlow();
+        saveState();
+    }
+});
+
+// ---------- Export: every screen and route, ready for the Prototype Kit ----------
+// Loaded before app.js. Produces:
+//   app/views/<page>.html   one Nunjucks view per screen
+//   app/flow-routes.js      POST routes for the whole flow (routes.js requires it)
+// and offers them as a .zip download or as a single Node setup script to paste and run.
+
+const EXPORT_INSTALL_NOTES = [
+    '1. Copy the app folder into your Prototype Kit project (merge it with the existing app folder).',
+    "2. Add this line to app/routes.js:  require('./flow-routes')",
+    '3. If you used HMRC components, install HMRC Frontend first: https://design.tax.service.gov.uk/hmrc-design-patterns/install-hmrc-frontend-in-your-prototype',
+    '4. Restart the kit and visit the first screen.',
+    ''
+].join('\n');
+
+// Run a generator against another page by temporarily making it the current one.
+function withPage(page, generate) {
+    const kept = [state.items, state.title];
+    [state.items, state.title] = [page.items, page.title];
+    try {
+        return generate();
+    } finally {
+        [state.items, state.title] = kept;
+    }
+}
+
+function exportFiles() {
+    const files = state.pages.map(page => ({
+        name: `app/views/${page.name}.html`,
+        content: withPage(page, generateNunjucks)
+    }));
+    files.push({ name: 'app/flow-routes.js', content: generateRoutes() });
+    return files;
+}
+
+// A Node script that writes the files into a Prototype Kit project and links the routes.
+function setupScript(files) {
+    const body = files.map(f => `    ${JSON.stringify(f.name)}: ${JSON.stringify(f.content)}`).join(',\n');
+    return `// Run from the root of your Prototype Kit project:  node import-flow.js
+const fs = require('fs')
+const path = require('path')
+
+if (!fs.existsSync('app')) {
+  console.error('No app folder found. Run this from the root of your Prototype Kit project.')
+  process.exit(1)
+}
+
+const files = {
+${body}
+}
+
+for (const [file, content] of Object.entries(files)) {
+  const existed = fs.existsSync(file)
+  fs.mkdirSync(path.dirname(file), { recursive: true })
+  fs.writeFileSync(file, content)
+  console.log((existed ? 'Replaced ' : 'Wrote ') + file)
+}
+
+const line = "require('./flow-routes')"
+const routes = 'app/routes.js'
+if (fs.existsSync(routes) && !fs.readFileSync(routes, 'utf8').includes(line)) {
+  fs.appendFileSync(routes, '\\n' + line + '\\n')
+  console.log('Added ' + line + ' to ' + routes)
+}
+`;
+}
+
+// ----- Minimal zip writer (files are stored, not compressed) -----
+function crc32(bytes) {
+    let crc = -1;
+    for (const byte of bytes) {
+        crc ^= byte;
+        for (let k = 0; k < 8; k++) crc = (crc >>> 1) ^ (0xEDB88320 & -(crc & 1));
+    }
+    return ~crc >>> 0;
+}
+
+function buildZip(files) {
+    const encoder = new TextEncoder();
+    const parts = [], directory = [];
+    let offset = 0;
+    files.forEach(file => {
+        const name = encoder.encode(file.name), data = encoder.encode(file.content);
+        const crc = crc32(data), size = data.length;
+        const local = new DataView(new ArrayBuffer(30));
+        local.setUint32(0, 0x04034b50, true);
+        local.setUint16(4, 20, true);       // version needed
+        local.setUint16(6, 0x0800, true);   // UTF-8 names
+        local.setUint16(12, 33, true);      // date: 1980-01-01
+        local.setUint32(14, crc, true);
+        local.setUint32(18, size, true);
+        local.setUint32(22, size, true);
+        local.setUint16(26, name.length, true);
+        parts.push(new Uint8Array(local.buffer), name, data);
+        const entry = new DataView(new ArrayBuffer(46));
+        entry.setUint32(0, 0x02014b50, true);
+        entry.setUint16(4, 20, true);
+        entry.setUint16(6, 20, true);
+        entry.setUint16(8, 0x0800, true);
+        entry.setUint16(14, 33, true);
+        entry.setUint32(16, crc, true);
+        entry.setUint32(20, size, true);
+        entry.setUint32(24, size, true);
+        entry.setUint16(28, name.length, true);
+        entry.setUint32(42, offset, true);  // where the file starts
+        directory.push(new Uint8Array(entry.buffer), name);
+        offset += 30 + name.length + size;
+    });
+    const directorySize = directory.reduce((n, part) => n + part.length, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true);
+    end.setUint16(8, files.length, true);
+    end.setUint16(10, files.length, true);
+    end.setUint32(12, directorySize, true);
+    end.setUint32(16, offset, true);
+    return new Blob([...parts, ...directory, new Uint8Array(end.buffer)], { type: 'application/zip' });
+}
+
+async function copyText(text) {
+    try {
+        await navigator.clipboard.writeText(text);
+        return true;
+    } catch (_) {
+        const box = document.createElement('textarea');
+        box.value = text;
+        document.body.appendChild(box);
+        box.select();
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (__) { }
+        box.remove();
+        return ok;
+    }
+}
+
+function renderExport(sb) {
+    const files = exportFiles();
+    const names = state.pages.map(p => p.name);
+    const duplicates = [...new Set(names.filter((n, i) => names.indexOf(n) !== i))];
+    const warning = duplicates.length
+        ? `<p class="hint" role="alert"><b>Warning:</b> more than one screen is named ${duplicates.map(escapeHtml).join(', ')}. Rename them, or only one will be kept.</p>`
+        : '';
+    sb.innerHTML = `
+        <h2>Export to the Prototype Kit</h2>
+        <p class="hint">${state.pages.length} screen${state.pages.length === 1 ? '' : 's'} and their routes, as ${files.length} files:</p>
+        ${warning}
+        <ul class="filelist">${files.map(f => `<li>${escapeHtml(f.name)}</li>`).join('')}</ul>
+        <div class="row">
+            <button class="btn" data-export="zip">Download .zip</button>
+            <button class="btn s" data-export="script">Copy setup script</button>
+        </div>
+        <p class="hint" id="exmsg" role="status"></p>
+        <details>
+            <summary>How to add these to your prototype</summary>
+            <p class="hint"><b>Zip:</b> unzip it, copy the <code>app</code> folder into your Prototype Kit project, then add <code>require('./flow-routes')</code> to <code>app/routes.js</code>.</p>
+            <p class="hint"><b>Setup script:</b> paste it into a file called <code>import-flow.js</code> in your project's root folder and run <code>node import-flow.js</code>. It writes every file and adds the require line for you.</p>
+            <p class="hint">Downloads can be blocked on some pages. If nothing downloads, use the setup script.</p>
+        </details>`;
+}
+
+document.addEventListener('click', async ev => {
+    const button = ev.target.closest('[data-export]');
+    if (!button) return;
+    const files = exportFiles();
+    const message = $('#exmsg');
+    if (button.dataset.export === 'zip') {
+        const blob = buildZip([...files, { name: 'INSTALL.txt', content: EXPORT_INSTALL_NOTES }]);
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'govuk-prototype-flow.zip';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        message.textContent = 'Zip created. If nothing downloaded, use the setup script instead.';
+    } else {
+        const ok = await copyText(setupScript(files));
+        message.textContent = ok ? 'Setup script copied. Save it as import-flow.js and run it with node.' : 'Could not copy automatically.';
+    }
+});
+
+// ---------- HMRC components (from design.tax.service.gov.uk) and the GOV.UK link ----------
+// Loaded before app.js, which merges HMRC_COMPONENTS into COMPONENTS.
+// m is [macro, folder, library]; the library defaults to 'govuk'. u overrides the guidance link.
+// HMRC macros need HMRC Frontend installed in the Prototype Kit project.
+
+const HMRC_URL = 'https://design.tax.service.gov.uk/hmrc-design-patterns/';
+const HMRC_HOME = 'https://www.gov.uk/government/organisations/hm-revenue-customs';
+
+// "15 July 2020" -> "2020-07-15" (empty if the date cannot be read)
+function isoDate(text) {
+    const d = new Date(text);
+    if (isNaN(d)) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+// Shared by the currency input and the reference number patterns (all use govukInput).
+function hmrcInputHtml(p, prefix, labelClass) {
+    const describedBy = p.hint ? ` aria-describedby="${p.name}-hint"` : '';
+    const input = `<input class="govuk-input govuk-input--width-10" id="${p.name}" name="${p.name}" type="text"${prefix ? ' spellcheck="false"' : ''}${describedBy}>`;
+    const field = prefix
+        ? `<div class="govuk-input__wrapper"><div class="govuk-input__prefix" aria-hidden="true">${prefix}</div>${input}</div>`
+        : input;
+    return `<div class="govuk-form-group"><label class="govuk-label${labelClass}" for="${p.name}">${escapeHtml(p.label)}</label>${hintHtml(p.hint, p.name)}${field}</div>`;
+}
+
+function hmrcInputMacro(p, prefix, labelClass) {
+    const labelClasses = labelClass ? `, classes: ${quote(labelClass.trim())}` : '';
+    return `{{ govukInput({
+  id: ${quote(p.name)},
+  name: ${quote(p.name)},
+  label: { text: ${quote(p.label)}${labelClasses} },
+${hintMacro(p.hint)}${prefix ? `  prefix: { text: ${quote(prefix)} },\n` : ''}  classes: "govuk-input--width-10"${prefix ? ',\n  spellcheck: false' : ''}
+}) }}`;
+}
+
+const timelineRows = p => splitLines(p.items).map(line => line.split('|').map(s => s.trim()));
+
+const HMRC_COMPONENTS = {
+    link: {
+        n: 'Link', g: 'Content', u: 'https://design-system.service.gov.uk/styles/links/',
+        p: [['text', 'Link text', 'Find out more about this service'], ['href', 'Link', '#'], ['newTab', 'Opens in a new tab', 'no', ['no', 'yes']]],
+        h: p => `<p class="govuk-body"><a class="govuk-link" href="${escapeHtml(p.href)}"${p.newTab === 'yes' ? ' rel="noreferrer noopener" target="_blank"' : ''}>${escapeHtml(p.text)}${p.newTab === 'yes' ? ' (opens in new tab)' : ''}</a></p>`
+    },
+    hmrcBanner: {
+        n: 'HMRC banner', g: 'HMRC', blk: 'beforeContent', u: HMRC_URL + 'hmrc-banner',
+        m: ['hmrcBanner', 'banner', 'hmrc'], p: [],
+        h: () => '<div class="hmrc-banner"><div class="govuk-width-container"><div class="hmrc-organisation-logo"><p class="govuk-body-s">HM Revenue &amp; Customs</p></div></div></div>',
+        j: () => '{{ hmrcBanner() }}'
+    },
+    hmrcInternalHeader: {
+        n: 'Internal header', g: 'HMRC', blk: 'header', u: HMRC_URL + 'internal-header',
+        m: ['hmrcInternalHeader', 'internal-header', 'hmrc'],
+        p: [['href', 'Logo link', HMRC_HOME], ['serviceUrl', 'Service link', '#']],
+        h: p => `<header class="hmrc-internal-header"><div class="govuk-width-container"><div class="hmrc-internal-header__logo"><a href="${escapeHtml(p.href)}" class="hmrc-internal-header__logo-link"><span class="hmrc-internal-header__logo-text">HM Revenue &amp; Customs</span></a></div></div></header>`,
+        j: p => `{{ hmrcInternalHeader({\n  homepageUrl: ${quote(p.href)},\n  serviceUrl: ${quote(p.serviceUrl)}\n}) }}`
+    },
+    hmrcPageHeading: {
+        n: 'Page heading', g: 'HMRC', u: HMRC_URL + 'page-heading',
+        p: [['section', 'Section heading', 'Your details'], ['text', 'Main heading', 'What is your name?']],
+        h: p => `<h2 class="govuk-caption-l hmrc-caption-l"><span class="govuk-visually-hidden">This section is: </span>${escapeHtml(p.section)}</h2>\n<h1 class="govuk-heading-l">${escapeHtml(p.text)}</h1>`
+    },
+    hmrcBadge: {
+        n: 'Notification badge', g: 'HMRC', u: HMRC_URL + 'notification-badge',
+        m: ['hmrcNotificationBadge', 'notification-badge', 'hmrc'],
+        p: [['text', 'Link text', 'Messages'], ['count', 'Number of notifications', '32']],
+        h: p => `<p class="govuk-body"><a class="govuk-link" href="#">${escapeHtml(p.text)} <span class="hmrc-notification-badge">${escapeHtml(p.count)}</span></a></p>`,
+        j: p => `<p class="govuk-body"><a class="govuk-link" href="#">${escapeHtml(p.text)} {{ hmrcNotificationBadge({ text: ${quote(p.count)} }) }}</a></p>`
+    },
+    hmrcTimeline: {
+        n: 'Timeline', g: 'HMRC', u: HMRC_URL + 'timeline',
+        m: ['hmrcTimeline', 'timeline', 'hmrc'],
+        p: [['items', 'Events, newest first (title | date | description)', 'Repayment complete | 15 July 2020 | We repaid you £50.\nChecking your claim | 14 July 2020 | We are checking your claim.', 'area']],
+        h: p => `<ol class="hmrc-timeline">${timelineRows(p).map(([title, time, text]) => `<li class="hmrc-timeline__event"><h2 class="hmrc-timeline__event-title">${escapeHtml(title)}</h2><time class="hmrc-timeline__event-meta" datetime="${isoDate(time)}">${escapeHtml(time || '')}</time><div class="hmrc-timeline__event-content"><p class="govuk-body">${escapeHtml(text || '')}</p></div></li>`).join('')}</ol>`,
+        j: p => {
+            const rows = timelineRows(p);
+            const sets = rows.map(([, , text], i) => `{% set timelineContent${i + 1} %}<p class="govuk-body">${escapeHtml(text || '')}</p>{% endset %}`).join('\n');
+            const events = rows.map(([title, time], i) => `    {\n      title: ${quote(title)},\n      datetime: ${quote(isoDate(time))},\n      time: ${quote(time || '')},\n      content: timelineContent${i + 1}\n    }`).join(',\n');
+            return `${sets}\n\n{{ hmrcTimeline({\n  headingLevel: 2,\n  events: [\n${events}\n  ]\n}) }}`;
+        }
+    },
+    hmrcResearch: {
+        n: 'Research banner', g: 'HMRC', blk: 'beforeContent', u: HMRC_URL + 'research-banner',
+        m: ['hmrcUserResearchBanner', 'user-research-banner', 'hmrc'],
+        p: [['url', 'Sign-up link', HMRC_HOME], ['hideClose', 'Hide the close button (linear journeys)', 'yes', ['yes', 'no']]],
+        h: p => `<div class="hmrc-user-research-banner" data-module="hmrc-user-research-banner"><div class="hmrc-user-research-banner__container govuk-width-container"><div class="hmrc-user-research-banner__text"><h2 class="govuk-heading-s hmrc-user-research-banner__title">You may receive a voucher for feedback</h2><a class="govuk-link hmrc-user-research-banner__link" rel="noopener noreferrer" href="${escapeHtml(p.url)}" target="_blank">Join our research panel (opens in new tab)</a></div>${p.hideClose === 'yes' ? '' : '<button class="govuk-button govuk-button--secondary hmrc-user-research-banner__close"><span aria-hidden="true">Hide message</span><span class="govuk-visually-hidden">Hide message. I do not want to take part in research</span></button>'}</div></div>`,
+        j: p => `{{ hmrcUserResearchBanner({\n  url: ${quote(p.url)}${p.hideClose === 'yes' ? ',\n  hideCloseButton: true' : ''}\n}) }}`
+    },
+    hmrcCurrency: {
+        n: 'Currency input', g: 'HMRC', f: 1, u: HMRC_URL + 'currency-input',
+        m: ['govukInput', 'input'],
+        p: [['label', 'Label', 'How much does your employer pay towards this?'], ['name', 'Name', 'currency'], ['hint', 'Hint', 'For example, £600 or £193.54.']],
+        h: p => hmrcInputHtml(p, '£', ''),
+        j: p => hmrcInputMacro(p, '£', '')
+    },
+    hmrcUtr: {
+        n: 'Unique Taxpayer Reference', g: 'HMRC', f: 1, u: HMRC_URL + 'unique-taxpayer-reference',
+        m: ['govukInput', 'input'],
+        p: [['label', 'Label', 'What is your Self Assessment UTR?'], ['name', 'Name', 'utr'], ['hint', 'Hint', 'Your UTR can be 10 or 13 digits long.']],
+        h: p => hmrcInputHtml(p, '', ' govuk-label--m'),
+        j: p => hmrcInputMacro(p, '', ' govuk-label--m')
+    },
+    hmrcVat: {
+        n: 'VAT registration number', g: 'HMRC', f: 1, u: HMRC_URL + 'vat-registration-number',
+        m: ['govukInput', 'input'],
+        p: [['label', 'Label', 'VAT registration number'], ['name', 'Name', 'vat-registration-number'], ['hint', 'Hint', 'This is 9 numbers, sometimes with ‘GB’ at the start, for example 123456789 or GB123456789. You can find it on your VAT registration certificate.', 'area']],
+        h: p => hmrcInputHtml(p, '', ''),
+        j: p => hmrcInputMacro(p, '', '')
+    }
+};
+
+// ---------- Preview: click through the journey in the browser ----------
+// Loaded before app.js. Shows each screen as it will look, follows page.next and the
+// radio branches (page.branch) when a button is pressed, and keeps the answers in `data`,
+// like req.session.data in the Prototype Kit.
+
+const preview = { pageId: null, startId: null, history: [], data: {}, message: '', wasActive: false };
+
+function restartPreview() {
+    const first = state.pages.find(p => p.id === preview.startId) || state.pages[0];
+    Object.assign(preview, { pageId: first.id, startId: first.id, history: [], data: {}, message: '' });
+}
+
+// The full page for one screen, with each component in its layout block.
+function previewPageHtml(page) {
+    return BLOCK_ORDER.map(block =>
+        page.items.filter(i => blockOf(i) === block).map(i => COMPONENTS[i.t].h(i.p)).join('')
+    ).join('');
+}
+
+function renderPreview() {
+    const el = $('#preview');
+    const active = state.view === 'preview';
+    el.hidden = !active;
+    if (!active) { preview.wasActive = false; return; }
+    if (!preview.wasActive || !pageById(preview.pageId)) restartPreview();
+    preview.wasActive = true;
+
+    const page = pageById(preview.pageId);
+    const options = state.pages.map(p => `<option value="${p.id}"${p.id === preview.startId ? ' selected' : ''}>/${escapeHtml(p.name)}</option>`).join('');
+    el.innerHTML = `
+        <div class="pv-bar">
+            <button class="btn s" data-pv="back"${preview.history.length ? '' : ' disabled'}>Back</button>
+            <button class="btn s" data-pv="restart">Restart</button>
+            <label for="pv-start">Start at</label>
+            <select class="fld" id="pv-start" style="width:auto">${options}</select>
+            <span class="hint">/${escapeHtml(page.name)} (step ${preview.history.length + 1})</span>
+        </div>
+        <p class="flow-help" role="status">${escapeHtml(preview.message || 'Choose answers and press the buttons to follow the journey.')}</p>
+        <div class="page"><div class="in" id="pv-page">${previewPageHtml(page)}</div></div>
+        <details class="pv-data"><summary>Session data</summary><pre>${escapeHtml(JSON.stringify(preview.data, null, 2))}</pre></details>`;
+    restoreAnswers();
+}
+
+// Put earlier answers back into the form, so Back keeps what the user chose.
+function restoreAnswers() {
+    document.querySelectorAll('#pv-page [name]').forEach(field => {
+        const saved = preview.data[field.name];
+        if (saved === undefined || field.type === 'file') return;
+        if (field.type === 'radio') field.checked = field.value === saved;
+        else if (field.type === 'checkbox') field.checked = [].concat(saved).includes(field.value);
+        else field.value = saved;
+    });
+}
+
+function captureAnswers() {
+    document.querySelectorAll('#pv-page [name]').forEach(field => {
+        const name = field.name;
+        if (field.type === 'checkbox') {
+            const ticked = [...document.querySelectorAll('#pv-page [name]')].filter(f => f.name === name && f.checked).map(f => f.value);
+            if (ticked.length) preview.data[name] = ticked; else delete preview.data[name];
+        } else if (field.type === 'radio') {
+            if (field.checked) preview.data[name] = field.value;
+        } else if (field.type !== 'file') {
+            preview.data[name] = field.value;
+        }
+    });
+}
+
+// The screen to go to: a branch for the chosen radio answer, otherwise the page's next screen.
+function nextPageFor(page) {
+    const branch = page.branch || {};
+    for (const radios of page.items.filter(i => i.t === 'radios')) {
+        const chosen = [...document.querySelectorAll('#pv-page input[type="radio"]')].find(r => r.name === radios.p.name && r.checked);
+        const target = chosen && branch[radios.p.name + '=' + chosen.value];
+        if (target && pageById(target)) return target;
+    }
+    return pageById(page.next) ? page.next : '';
+}
+
+function goTo(id) {
+    preview.history.push(preview.pageId);
+    preview.pageId = id;
+    preview.message = '';
+    renderPreview();
+}
+
+document.addEventListener('click', ev => {
+    const control = ev.target.closest('[data-pv]');
+    if (control && control.dataset.pv === 'restart') { restartPreview(); return renderPreview(); }
+    if (control && control.dataset.pv === 'back') return previewBack();
+    const inPage = ev.target.closest('#pv-page');
+    if (!inPage) return;
+    const link = ev.target.closest('a');
+    if (link) {
+        ev.preventDefault();
+        if (link.classList.contains('govuk-back-link')) previewBack();
+        return;
+    }
+    if (ev.target.closest('button[type="submit"]')) {
+        const page = pageById(preview.pageId);
+        captureAnswers();
+        const next = nextPageFor(page);
+        if (next) return goTo(next);
+        preview.message = `/${page.name} has no next screen. Connect it to another screen in the Flow view.`;
+        renderPreview();
+    }
+});
+
+document.addEventListener('change', ev => {
+    if (ev.target.id !== 'pv-start') return;
+    preview.startId = ev.target.value;
+    restartPreview();
+    renderPreview();
+});
+
+function previewBack() {
+    if (!preview.history.length) return;
+    captureAnswers();
+    preview.pageId = preview.history.pop();
+    preview.message = '';
+    renderPreview();
+}
+
+// ---------- String helpers used by the code generators ----------
+const escapeHtml = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+const quote = s => JSON.stringify(String(s));
+
+const slugify = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'x';
+
+const splitLines = s => String(s).split('\n').map(x => x.trim()).filter(Boolean);
+
+// ---------- HTML and Nunjucks builders shared by several components ----------
+const labelHtml = (t, n, z = 's') => `<label class="govuk-label govuk-label--${z}" for="${n}">${escapeHtml(t)}</label>`;
+
+const hintHtml = (t, n) => t ? `<div id="${n}-hint" class="govuk-hint">${escapeHtml(t)}</div>` : '';
+
+const hintMacro = t => t ? `  hint: { text: ${quote(t)} },\n` : '';
+
+const choiceItemsHtml = (o, n, ty, cls) => splitLines(o).map((x, i) => `<div class="govuk-${cls}__item"><input class="govuk-${cls}__input" id="${n}-${i + 1}" name="${n}" type="${ty}" value="${slugify(x)}"><label class="govuk-label govuk-${cls}__label" for="${n}-${i + 1}">${escapeHtml(x)}</label></div>`).join('');
+
+const choiceItemsMacro = o => `  items: [\n${splitLines(o).map(x => `    { value: ${quote(slugify(x))}, text: ${quote(x)} }`).join(',\n')}\n  ]`;
+
+const choiceGroupHtml = (p, cls, ty) => `<div class="govuk-form-group"><fieldset class="govuk-fieldset"><legend class="govuk-fieldset__legend govuk-fieldset__legend--m">${escapeHtml(p.legend)}</legend>${hintHtml(p.hint, p.name)}<div class="govuk-${cls}" data-module="govuk-${cls}">${choiceItemsHtml(p.options, p.name, ty, cls)}</div></fieldset></div>`;
+
+const choiceGroupMacro = (m, p) => `{{ ${m}({\n  name: ${quote(p.name)},\n  fieldset: { legend: { text: ${quote(p.legend)}, classes: "govuk-fieldset__legend--m" } },\n${hintMacro(p.hint)}${choiceItemsMacro(p.options)}\n}) }}`;
+
+const fieldHtml = (p, tag) => `<div class="govuk-form-group">${labelHtml(p.label, p.name)}${hintHtml(p.hint, p.name)}<${tag} class="govuk-${tag}" id="${p.name}" name="${p.name}"${tag == 'input' ? ' type="text"' : ''}${p.hint ? ` aria-describedby="${p.name}-hint"` : ''}>${tag == 'input' ? '' : '</textarea>'}</div>`;
+
+const fieldMacro = (m, p) => `{{ ${m}({\n  label: { text: ${quote(p.label)}, classes: "govuk-label--s" },\n${hintMacro(p.hint)}  id: ${quote(p.name)},\n  name: ${quote(p.name)}\n}) }}`;
+
+const LABEL_PROP = ['label', 'Label', 'Your answer'], NAME_PROP = ['name', 'Name (id)', 'field-name'], HINT_PROP = ['hint', 'Hint (optional)', ''];
+
+// ---------- Component registry ----------
+// Each entry describes one GOV.UK component:
+//   n   display name            g    palette group
+//   m   [macro, folder]         p    editable properties [key, label, default, type]
+//   h   returns HTML (preview and HTML tab)   j   returns the Nunjucks macro call
+//   f   1 = form field          blk  Prototype Kit layout block, if not main content
+const COMPONENTS = {
+    heading: {
+        n: 'Heading',
+        g: 'Content',
+        p: [['text', 'Text', 'Apply for a licence'], ['size', 'Size', 'l', ['xl', 'l', 'm']]],
+        h: p => `<h1 class="govuk-heading-${p.size}">${escapeHtml(p.text)}</h1>`
+    },
+    paragraph: {
+        n: 'Paragraph',
+        g: 'Content',
+        p: [['text', 'Text', 'Use this service to apply online. It takes about 10 minutes.', 'area']],
+        h: p => `<p class="govuk-body">${escapeHtml(p.text)}</p>`
+    },
+    inset: {
+        n: 'Inset text',
+        g: 'Content',
+        m: ['govukInsetText', 'inset-text'],
+        p: [['text', 'Text', 'You can apply up to 3 months before your current licence expires.', 'area']],
+        h: p => `<div class="govuk-inset-text">${escapeHtml(p.text)}</div>`,
+        j: p => `{{ govukInsetText({ text: ${quote(p.text)} }) }}`
+    },
+    warning: {
+        n: 'Warning text',
+        g: 'Content',
+        m: ['govukWarningText', 'warning-text'],
+        p: [['text', 'Text', 'You could be fined if you do not apply in time.']],
+        h: p => `<div class="govuk-warning-text"><span class="govuk-warning-text__icon" aria-hidden="true">!</span><strong class="govuk-warning-text__text"><span class="govuk-visually-hidden">Warning</span>${escapeHtml(p.text)}</strong></div>`,
+        j: p => `{{ govukWarningText({ text: ${quote(p.text)}, iconFallbackText: "Warning" }) }}`
+    },
+    notification: {
+        n: 'Notification banner',
+        g: 'Content',
+        m: ['govukNotificationBanner', 'notification-banner'],
+        p: [['title', 'Title', 'Important'], ['text', 'Text', 'Your application has been saved.']],
+        h: p => `<div class="govuk-notification-banner" role="region" aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner"><div class="govuk-notification-banner__header"><h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">${escapeHtml(p.title)}</h2></div><div class="govuk-notification-banner__content"><p class="govuk-notification-banner__heading">${escapeHtml(p.text)}</p></div></div>`,
+        j: p => `{{ govukNotificationBanner({\n  titleText: ${quote(p.title)},\n  text: ${quote(p.text)}\n}) }}`
+    },
+    tag: {
+        n: 'Tag',
+        g: 'Content',
+        m: ['govukTag', 'tag'],
+        p: [['text', 'Text', 'In progress'], ['colour', 'Colour', 'blue', ['grey', 'green', 'blue', 'red', 'yellow']]],
+        h: p => `<strong class="govuk-tag govuk-tag--${p.colour}">${escapeHtml(p.text)}</strong>`,
+        j: p => `{{ govukTag({ text: ${quote(p.text)}, classes: "govuk-tag--${p.colour}" }) }}`
+    },
+    details: {
+        n: 'Details',
+        g: 'Content',
+        m: ['govukDetails', 'details'],
+        p: [['summary', 'Summary', 'Help with nationality'], ['text', 'Content', 'We need this to check your eligibility.', 'area']],
+        h: p => `<details class="govuk-details"><summary class="govuk-details__summary"><span class="govuk-details__summary-text">${escapeHtml(p.summary)}</span></summary><div class="govuk-details__text">${escapeHtml(p.text)}</div></details>`,
+        j: p => `{{ govukDetails({\n  summaryText: ${quote(p.summary)},\n  text: ${quote(p.text)}\n}) }}`
+    },
+    input: {
+        n: 'Text input',
+        g: 'Form',
+        f: 1,
+        m: ['govukInput', 'input'],
+        p: [LABEL_PROP, NAME_PROP, HINT_PROP],
+        h: p => fieldHtml(p, 'input'),
+        j: p => fieldMacro('govukInput', p)
+    },
+    textarea: {
+        n: 'Textarea',
+        g: 'Form',
+        f: 1,
+        m: ['govukTextarea', 'textarea'],
+        p: [['label', 'Label', 'Tell us more'], NAME_PROP, HINT_PROP],
+        h: p => fieldHtml(p, 'textarea'),
+        j: p => fieldMacro('govukTextarea', p)
+    },
+    radios: {
+        n: 'Radios',
+        g: 'Form',
+        f: 1,
+        m: ['govukRadios', 'radios'],
+        p: [['legend', 'Question', 'Do you have a UK passport?'], ['name', 'Name', 'passport'], HINT_PROP, ['options', 'Options (one per line)', 'Yes\nNo', 'area']],
+        h: p => choiceGroupHtml(p, 'radios', 'radio'),
+        j: p => choiceGroupMacro('govukRadios', p)
+    },
+    checkboxes: {
+        n: 'Checkboxes',
+        g: 'Form',
+        f: 1,
+        m: ['govukCheckboxes', 'checkboxes'],
+        p: [['legend', 'Question', 'What do you need?'], ['name', 'Name', 'needs'], HINT_PROP, ['options', 'Options (one per line)', 'Passport\nDriving licence\nBirth certificate', 'area']],
+        h: p => choiceGroupHtml(p, 'checkboxes', 'checkbox'),
+        j: p => choiceGroupMacro('govukCheckboxes', p)
+    },
+    select: {
+        n: 'Select',
+        g: 'Form',
+        f: 1,
+        m: ['govukSelect', 'select'],
+        p: [['label', 'Label', 'Sort by'], ['name', 'Name', 'sort'], ['options', 'Options (one per line)', 'Recently updated\nRecently published\nMost views', 'area']],
+        h: p => `<div class="govuk-form-group">${labelHtml(p.label, p.name)}<select class="govuk-select" id="${p.name}" name="${p.name}">${splitLines(p.options).map(o => `<option value="${slugify(o)}">${escapeHtml(o)}</option>`).join('')}</select></div>`,
+        j: p => `{{ govukSelect({\n  id: ${quote(p.name)},\n  name: ${quote(p.name)},\n  label: { text: ${quote(p.label)}, classes: "govuk-label--s" },\n${choiceItemsMacro(p.options)}\n}) }}`
+    },
+    button: {
+        n: 'Button',
+        g: 'Form',
+        m: ['govukButton', 'button'],
+        p: [['text', 'Text', 'Continue']],
+        h: p => `<button type="submit" class="govuk-button" data-module="govuk-button">${escapeHtml(p.text)}</button>`,
+        j: p => `{{ govukButton({ text: ${quote(p.text)} }) }}`
+    },
+    back: {
+        n: 'Back link',
+        g: 'Navigation',
+        blk: 'beforeContent',
+        m: ['govukBackLink', 'back-link'],
+        p: [['text', 'Text', 'Back'], ['href', 'Link', 'javascript:history.back()']],
+        h: p => `<a href="${escapeHtml(p.href)}" class="govuk-back-link">${escapeHtml(p.text)}</a>`,
+        j: p => `{{ govukBackLink({ text: ${quote(p.text)}, href: ${quote(p.href)} }) }}`
+    },
+    accordion: {
+        n: 'Accordion',
+        g: 'Content',
+        m: ['govukAccordion', 'accordion'],
+        p: [['items', 'Sections (heading | content)', 'Documents | List the documents you need.\nPayment | Pay online by card.', 'area']],
+        h: p => `<div class="govuk-accordion" data-module="govuk-accordion" id="accordion-1">${splitPairs(p.items).map(([a, b], i) => `<div class="govuk-accordion__section"><div class="govuk-accordion__section-header"><h2 class="govuk-accordion__section-heading"><span class="govuk-accordion__section-button" id="accordion-1-heading-${i + 1}">${escapeHtml(a)}</span></h2></div><div id="accordion-1-content-${i + 1}" class="govuk-accordion__section-content"><p class="govuk-body">${escapeHtml(b)}</p></div></div>`).join('')}</div>`,
+        j: p => `{{ govukAccordion({\n  id: "accordion-1",\n  items: [\n${splitPairs(p.items).map(([a, b]) => `    {\n      heading: { text: ${quote(a)} },\n      content: { text: ${quote(b)} }\n    }`).join(',\n')}\n  ]\n}) }}`
+    },
+    panel: {
+        n: 'Panel',
+        g: 'Content',
+        m: ['govukPanel', 'panel'],
+        p: [['title', 'Title', 'Application complete'], ['text', 'Body', 'Your reference number<br><strong>HDJ2123F</strong>', 'area']],
+        h: p => `<div class="govuk-panel govuk-panel--confirmation"><h1 class="govuk-panel__title">${escapeHtml(p.title)}</h1><div class="govuk-panel__body">${p.text}</div></div>`,
+        j: p => `{{ govukPanel({\n  titleText: ${quote(p.title)},\n  html: ${quote(p.text)}\n}) }}`
+    },
+    summary: {
+        n: 'Summary list',
+        g: 'Content',
+        m: ['govukSummaryList', 'summary-list'],
+        p: [['rows', 'Rows (key | value)', 'Name | Sarah Philips\nDate of birth | 5 January 1978', 'area']],
+        h: p => `<dl class="govuk-summary-list">${splitPairs(p.rows).map(([a, b]) => `<div class="govuk-summary-list__row"><dt class="govuk-summary-list__key">${escapeHtml(a)}</dt><dd class="govuk-summary-list__value">${escapeHtml(b)}</dd></div>`).join('')}</dl>`,
+        j: p => `{{ govukSummaryList({\n  rows: [\n${splitPairs(p.rows).map(([a, b]) => `    {\n      key: { text: ${quote(a)} },\n      value: { text: ${quote(b)} }\n    }`).join(',\n')}\n  ]\n}) }}`
+    },
+    table: {
+        n: 'Table',
+        g: 'Content',
+        m: ['govukTable', 'table'],
+        p: [['caption', 'Caption', 'Dates and amounts'], ['rows', 'Rows (first line is the header)', 'Date | Amount\n First 6 weeks | £109.80\nNext 33 weeks | £109.80', 'area']],
+        h: p => { const r = splitPairs(p.rows).map(([a, b]) => [a, ...(b ? b.split('|').map(s => s.trim()) : [])]); const hd = r.shift() || []; return `<table class="govuk-table"><caption class="govuk-table__caption govuk-table__caption--m">${escapeHtml(p.caption)}</caption><thead class="govuk-table__head"><tr class="govuk-table__row">${hd.map(c => `<th scope="col" class="govuk-table__header">${escapeHtml(c)}</th>`).join('')}</tr></thead><tbody class="govuk-table__body">${r.map(x => `<tr class="govuk-table__row">${x.map(c => `<td class="govuk-table__cell">${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`; },
+        j: p => { const r = splitPairs(p.rows).map(([a, b]) => [a, ...(b ? b.split('|').map(s => s.trim()) : [])]); const hd = r.shift() || []; return `{{ govukTable({\n  caption: ${quote(p.caption)},\n  captionClasses: "govuk-table__caption--m",\n  head: [${hd.map(c => `{ text: ${quote(c)} }`).join(', ')}],\n  rows: [\n${r.map(x => `    [${x.map(c => `{ text: ${quote(c)} }`).join(', ')}]`).join(',\n')}\n  ]\n}) }}`; }
+    },
+    tabs: {
+        n: 'Tabs',
+        g: 'Content',
+        m: ['govukTabs', 'tabs'],
+        p: [['items', 'Tabs (title | content)', 'Past day | Content for the past day.\nPast week | Content for the past week.', 'area']],
+        h: p => `<div class="govuk-tabs" data-module="govuk-tabs"><h2 class="govuk-tabs__title">Contents</h2><ul class="govuk-tabs__list">${splitPairs(p.items).map(([a], i) => `<li class="govuk-tabs__list-item${i ? '' : ' govuk-tabs__list-item--selected'}"><a class="govuk-tabs__tab" href="#tab-${i + 1}">${escapeHtml(a)}</a></li>`).join('')}</ul>${splitPairs(p.items).map(([, b], i) => `<div class="govuk-tabs__panel${i ? ' govuk-tabs__panel--hidden' : ''}" id="tab-${i + 1}"><p class="govuk-body">${escapeHtml(b)}</p></div>`).join('')}</div>`,
+        j: p => `{{ govukTabs({\n  items: [\n${splitPairs(p.items).map(([a, b], i) => `    {\n      label: ${quote(a)},\n      id: "tab-${i + 1}",\n      panel: { text: ${quote(b)} }\n    }`).join(',\n')}\n  ]\n}) }}`
+    },
+    tasks: {
+        n: 'Task list',
+        g: 'Content',
+        m: ['govukTaskList', 'task-list'],
+        p: [['items', 'Tasks (name | status)', 'Check eligibility | Completed\nAdd details | Not started', 'area']],
+        h: p => `<ul class="govuk-task-list">${splitPairs(p.items).map(([a, b]) => `<li class="govuk-task-list__item govuk-task-list__item--with-link"><div class="govuk-task-list__name-and-hint"><a class="govuk-link govuk-task-list__link" href="#">${escapeHtml(a)}</a></div><div class="govuk-task-list__status">${/^completed$/i.test(b) ? escapeHtml(b) : `<strong class="govuk-tag govuk-tag--blue">${escapeHtml(b)}</strong>`}</div></li>`).join('')}</ul>`,
+        j: p => `{{ govukTaskList({\n  idPrefix: "task-list",\n  items: [\n${splitPairs(p.items).map(([a, b]) => `    {\n      title: { text: ${quote(a)} },\n      href: "#",\n      status: ${/^completed$/i.test(b) ? `{ text: ${quote(b)} }` : `{ tag: { text: ${quote(b)}, classes: "govuk-tag--blue" } }`}\n    }`).join(',\n')}\n  ]\n}) }}`
+    },
+    date: {
+        n: 'Date input',
+        g: 'Form',
+        f: 1,
+        m: ['govukDateInput', 'date-input'],
+        p: [['legend', 'Question', 'What is your date of birth?'], ['name', 'Name', 'dob'], ['hint', 'Hint', 'For example, 27 3 2007']],
+        h: p => `<div class="govuk-form-group"><fieldset class="govuk-fieldset" role="group"><legend class="govuk-fieldset__legend govuk-fieldset__legend--m">${escapeHtml(p.legend)}</legend>${hintHtml(p.hint, p.name)}<div class="govuk-date-input" id="${p.name}">${[['Day', 2], ['Month', 2], ['Year', 4]].map(([l, w]) => `<div class="govuk-date-input__item"><div class="govuk-form-group"><label class="govuk-label govuk-date-input__label" for="${p.name}-${l.toLowerCase()}">${l}</label><input class="govuk-input govuk-date-input__input govuk-input--width-${w}" id="${p.name}-${l.toLowerCase()}" name="${p.name}-${l.toLowerCase()}" type="text" inputmode="numeric"></div></div>`).join('')}</div></fieldset></div>`,
+        j: p => `{{ govukDateInput({\n  id: ${quote(p.name)},\n  namePrefix: ${quote(p.name)},\n  fieldset: { legend: { text: ${quote(p.legend)}, classes: "govuk-fieldset__legend--m" } }${p.hint ? `,\n  hint: { text: ${quote(p.hint)} }` : ''}\n}) }}`
+    },
+    count: {
+        n: 'Character count',
+        g: 'Form',
+        f: 1,
+        m: ['govukCharacterCount', 'character-count'],
+        p: [['label', 'Label', 'Can you provide more detail?'], ['name', 'Name', 'more-detail'], ['limit', 'Character limit', '150']],
+        h: p => `<div class="govuk-form-group govuk-character-count" data-module="govuk-character-count" data-maxlength="${escapeHtml(p.limit)}">${labelHtml(p.label, p.name)}<textarea class="govuk-textarea govuk-js-character-count" id="${p.name}" name="${p.name}" rows="5"></textarea><div id="${p.name}-info" class="govuk-hint govuk-character-count__message">You can enter up to ${escapeHtml(p.limit)} characters</div></div>`,
+        j: p => `{{ govukCharacterCount({\n  name: ${quote(p.name)},\n  id: ${quote(p.name)},\n  maxlength: ${+p.limit || 150},\n  label: { text: ${quote(p.label)}, classes: "govuk-label--s" }\n}) }}`
+    },
+    upload: {
+        n: 'File upload',
+        g: 'Form',
+        f: 1,
+        m: ['govukFileUpload', 'file-upload'],
+        p: [['label', 'Label', 'Upload a file'], ['name', 'Name', 'file-upload']],
+        h: p => formGroup(p.label, p.name, '', `<input class="govuk-file-upload" id="${p.name}" name="${p.name}" type="file">`),
+        j: p => fieldMacro('govukFileUpload', p)
+    },
+    password: {
+        n: 'Password input',
+        g: 'Form',
+        f: 1,
+        m: ['govukPasswordInput', 'password-input'],
+        p: [['label', 'Label', 'Password'], ['name', 'Name', 'password']],
+        h: p => `<div class="govuk-form-group govuk-password-input" data-module="govuk-password-input">${labelHtml(p.label, p.name)}<div class="govuk-input__wrapper govuk-password-input__wrapper"><input class="govuk-input govuk-password-input__input govuk-js-password-input-input" id="${p.name}" name="${p.name}" type="password" spellcheck="false" autocomplete="current-password" autocapitalize="none"><button type="button" class="govuk-button govuk-button--secondary govuk-password-input__toggle govuk-js-password-input-toggle" data-module="govuk-button" aria-controls="${p.name}" aria-label="Show password" hidden>Show</button></div></div>`,
+        j: p => fieldMacro('govukPasswordInput', p)
+    },
+    fieldset: {
+        n: 'Fieldset',
+        g: 'Form',
+        m: ['govukFieldset', 'fieldset'],
+        p: [['legend', 'Legend', 'What is your address?'], ['size', 'Size', 'm', ['m', 's']]],
+        h: p => `<fieldset class="govuk-fieldset"><legend class="govuk-fieldset__legend govuk-fieldset__legend--${p.size}">${escapeHtml(p.legend)}</legend></fieldset>`,
+        j: p => `{{ govukFieldset({\n  legend: { text: ${quote(p.legend)}, classes: "govuk-fieldset__legend--${p.size}" }\n}) }}`
+    },
+    errmsg: {
+        n: 'Error message',
+        g: 'Form',
+        m: ['govukErrorMessage', 'error-message'],
+        p: [['text', 'Text', 'Enter your full name']],
+        h: p => `<p class="govuk-error-message"><span class="govuk-visually-hidden">Error:</span> ${escapeHtml(p.text)}</p>`,
+        j: p => `{{ govukErrorMessage({ text: ${quote(p.text)} }) }}`
+    },
+    errsum: {
+        n: 'Error summary',
+        g: 'Form',
+        m: ['govukErrorSummary', 'error-summary'],
+        p: [['title', 'Title', 'There is a problem'], ['items', 'Errors (text | #field)', 'Enter your full name | #full-name\nEnter a valid email address | #email', 'area']],
+        h: p => `<div class="govuk-error-summary" data-module="govuk-error-summary"><div role="alert"><h2 class="govuk-error-summary__title">${escapeHtml(p.title)}</h2><div class="govuk-error-summary__body"><ul class="govuk-list govuk-error-summary__list">${splitPairs(p.items).map(([a, b]) => `<li><a href="${escapeHtml(b)}">${escapeHtml(a)}</a></li>`).join('')}</ul></div></div></div>`,
+        j: p => `{{ govukErrorSummary({\n  titleText: ${quote(p.title)},\n  errorList: [\n${splitPairs(p.items).map(([a, b]) => `    { text: ${quote(a)}, href: ${quote(b)} }`).join(',\n')}\n  ]\n}) }}`
+    },
+    breadcrumbs: {
+        n: 'Breadcrumbs',
+        g: 'Navigation',
+        blk: 'beforeContent',
+        m: ['govukBreadcrumbs', 'breadcrumbs'],
+        p: [['items', 'Links (text | href)', 'Home | /\nPassports | /passports', 'area']],
+        h: p => `<nav class="govuk-breadcrumbs" aria-label="Breadcrumb"><ol class="govuk-breadcrumbs__list">${splitPairs(p.items).map(([a, b]) => `<li class="govuk-breadcrumbs__list-item"><a class="govuk-breadcrumbs__link" href="${escapeHtml(b)}">${escapeHtml(a)}</a></li>`).join('')}</ol></nav>`,
+        j: p => `{{ govukBreadcrumbs({\n  items: [\n${splitPairs(p.items).map(([a, b]) => `    { text: ${quote(a)}, href: ${quote(b)} }`).join(',\n')}\n  ]\n}) }}`
+    },
+    pagination: {
+        n: 'Pagination',
+        g: 'Navigation',
+        m: ['govukPagination', 'pagination'],
+        p: [['current', 'Current page', '2'], ['total', 'Total pages (max 10)', '5']],
+        h: p => { const [n, c] = pageNumbers(p); return `<nav class="govuk-pagination" aria-label="Pagination">${c > 1 ? `<div class="govuk-pagination__prev"><a class="govuk-link govuk-pagination__link" href="#" rel="prev">Previous</a></div>` : ''}<ul class="govuk-pagination__list">${Array.from({ length: n }, (_, i) => `<li class="govuk-pagination__item${i + 1 === c ? ' govuk-pagination__item--current' : ''}"><a class="govuk-link govuk-pagination__link" href="#" aria-label="Page ${i + 1}"${i + 1 === c ? ' aria-current="page"' : ''}>${i + 1}</a></li>`).join('')}</ul>${c < n ? `<div class="govuk-pagination__next"><a class="govuk-link govuk-pagination__link" href="#" rel="next">Next</a></div>` : ''}</nav>`; },
+        j: p => { const [n, c] = pageNumbers(p); return `{{ govukPagination({\n${c > 1 ? '  previous: { href: "#" },\n' : ''}${c < n ? '  next: { href: "#" },\n' : ''}  items: [\n${Array.from({ length: n }, (_, i) => `    { number: ${i + 1}, href: "#"${i + 1 === c ? ', current: true' : ''} }`).join(',\n')}\n  ]\n}) }}`; }
+    },
+    servicenav: {
+        n: 'Service navigation',
+        g: 'Navigation',
+        blk: 'header',
+        m: ['govukServiceNavigation', 'service-navigation'],
+        p: [['name', 'Service name', 'Apply for a licence'], ['items', 'Links (text | href)', 'Home | /\nAccount | /account', 'area']],
+        h: p => `<section aria-label="Service information" class="govuk-service-navigation" data-module="govuk-service-navigation"><div class="govuk-width-container"><div class="govuk-service-navigation__container"><span class="govuk-service-navigation__service-name"><a href="/" class="govuk-service-navigation__link">${escapeHtml(p.name)}</a></span><nav aria-label="Menu" class="govuk-service-navigation__wrapper"><ul class="govuk-service-navigation__list">${splitPairs(p.items).map(([a, b]) => `<li class="govuk-service-navigation__item"><a class="govuk-service-navigation__link" href="${escapeHtml(b)}">${escapeHtml(a)}</a></li>`).join('')}</ul></nav></div></div></section>`,
+        j: p => `{{ govukServiceNavigation({\n  serviceName: ${quote(p.name)},\n  serviceUrl: "/",\n  navigation: [\n${splitPairs(p.items).map(([a, b]) => `    { text: ${quote(a)}, href: ${quote(b)} }`).join(',\n')}\n  ]\n}) }}`
+    },
+    skip: {
+        n: 'Skip link',
+        g: 'Navigation',
+        blk: 'skipLink',
+        m: ['govukSkipLink', 'skip-link'],
+        p: [['text', 'Text', 'Skip to main content']],
+        h: p => `<a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">${escapeHtml(p.text)}</a>`,
+        j: p => `{{ govukSkipLink({ href: "#main-content", text: ${quote(p.text)} }) }}`
+    },
+    exit: {
+        n: 'Exit this page',
+        g: 'Navigation',
+        blk: 'bodyStart',
+        m: ['govukExitThisPage', 'exit-this-page'],
+        p: [['text', 'Text', 'Exit this page']],
+        h: p => `<div class="govuk-exit-this-page" data-module="govuk-exit-this-page"><a href="https://www.bbc.co.uk/weather" role="button" draggable="false" class="govuk-button govuk-button--warning govuk-exit-this-page__button govuk-js-exit-this-page-button" data-module="govuk-button"><span class="govuk-visually-hidden">Emergency</span> ${escapeHtml(p.text)}</a></div>`,
+        j: p => `{{ govukExitThisPage({ text: ${quote(p.text)} }) }}`
+    },
+    header: {
+        n: 'Header',
+        g: 'Page layout',
+        blk: 'header',
+        m: ['govukHeader', 'header'],
+        p: [['href', 'Logo link', '/']],
+        h: p => `<header class="govuk-header" data-module="govuk-header"><div class="govuk-header__container govuk-width-container"><div class="govuk-header__logo"><a href="${escapeHtml(p.href)}" class="govuk-header__link govuk-header__link--homepage"><span class="govuk-header__logotype-text">GOV.UK</span></a></div></div></header>`,
+        j: p => `{{ govukHeader({ homepageUrl: ${quote(p.href)} }) }}`
+    },
+    footer: {
+        n: 'Footer',
+        g: 'Page layout',
+        blk: 'footer',
+        m: ['govukFooter', 'footer'],
+        p: [['items', 'Links (text | href)', 'Help | /help\nPrivacy | /privacy\nCookies | /cookies\nAccessibility statement | /accessibility', 'area']],
+        h: p => `<footer class="govuk-footer"><div class="govuk-width-container"><div class="govuk-footer__meta"><div class="govuk-footer__meta-item govuk-footer__meta-item--grow"><h2 class="govuk-visually-hidden">Support links</h2><ul class="govuk-footer__inline-list">${splitPairs(p.items).map(([a, b]) => `<li class="govuk-footer__inline-list-item"><a class="govuk-footer__link" href="${escapeHtml(b)}">${escapeHtml(a)}</a></li>`).join('')}</ul></div></div></div></footer>`,
+        j: p => `{{ govukFooter({\n  meta: {\n    items: [\n${splitPairs(p.items).map(([a, b]) => `      { href: ${quote(b)}, text: ${quote(a)} }`).join(',\n')}\n    ]\n  }\n}) }}`
+    },
+    phase: {
+        n: 'Phase banner',
+        g: 'Page layout',
+        blk: 'beforeContent',
+        m: ['govukPhaseBanner', 'phase-banner'],
+        p: [['tag', 'Tag', 'Beta'], ['text', 'Text', 'This is a new service. Help us improve it.']],
+        h: p => `<div class="govuk-phase-banner"><p class="govuk-phase-banner__content"><strong class="govuk-tag govuk-phase-banner__content__tag">${escapeHtml(p.tag)}</strong><span class="govuk-phase-banner__text">${escapeHtml(p.text)}</span></p></div>`,
+        j: p => `{{ govukPhaseBanner({\n  tag: { text: ${quote(p.tag)} },\n  text: ${quote(p.text)}\n}) }}`
+    },
+    cookie: {
+        n: 'Cookie banner',
+        g: 'Page layout',
+        blk: 'bodyStart',
+        m: ['govukCookieBanner', 'cookie-banner'],
+        p: [['name', 'Service name', 'Apply for a licence']],
+        h: p => `<div class="govuk-cookie-banner" data-nosnippet role="region" aria-label="Cookies on ${escapeHtml(p.name)}"><div class="govuk-cookie-banner__message govuk-width-container"><h2 class="govuk-cookie-banner__heading govuk-heading-m">Cookies on ${escapeHtml(p.name)}</h2><div class="govuk-cookie-banner__content"><p class="govuk-body">We use some essential cookies to make this service work.</p></div><div class="govuk-button-group"><button type="button" class="govuk-button" data-module="govuk-button" name="cookies" value="accept">Accept additional cookies</button><button type="button" class="govuk-button" data-module="govuk-button" name="cookies" value="reject">Reject additional cookies</button><a class="govuk-link" href="/cookies">View cookies</a></div></div></div>`,
+        j: p => `{{ govukCookieBanner({\n  ariaLabel: ${quote('Cookies on ' + p.name)},\n  messages: [{\n    headingText: ${quote('Cookies on ' + p.name)},\n    text: "We use some essential cookies to make this service work.",\n    actions: [\n      { text: "Accept additional cookies", type: "button", name: "cookies", value: "accept" },\n      { text: "Reject additional cookies", type: "button", name: "cookies", value: "reject" },\n      { text: "View cookies", href: "/cookies" }\n    ]\n  }]\n}) }}`
+    }
+};
+
+Object.assign(COMPONENTS, HMRC_COMPONENTS);
+
+// ---------- App state and persistence ----------
+let state = {
+    items: [],
+    sel: null,
+    tab: 'p',
+    title: 'Page title'
+};
+try {
+    const s = JSON.parse(localStorage.getItem('govuk-builder') || 'null');
+    if (s && Array.isArray(s.items))
+        state = Object.assign(state, s, { tab: 'p' });
+}
+catch (_) { }
+if (!state.pages || !state.pages.length) {
+    state.pages = [{
+            id: 'p1',
+            name: 'start',
+            title: state.title,
+            items: state.items,
+            next: '',
+            branch: {}
+        }];
+    state.cur = 0;
+}
+state.cur = Math.min(state.cur || 0, state.pages.length - 1);
+state.items = state.pages[state.cur].items;
+state.title = state.pages[state.cur].title;
+
+const $ = s => document.querySelector(s);
+
+const saveState = () => { const P = state.pages[state.cur]; if (P) {
+    P.items = state.items;
+    P.title = state.title;
+} try {
+    localStorage.setItem('govuk-builder', JSON.stringify(state));
+}
+catch (_) { } };
+
+const createItem = t => { const p = {}; COMPONENTS[t].p.forEach(([k, , d]) => p[k] = d); return { t, p }; };
+
+// ---------- Rendering ----------
+function renderPalette() {
+    const groups = ['Content', 'Form', 'Navigation', 'Page layout', 'HMRC'];
+    const sections = groups.map(group => {
+        const items = Object.entries(COMPONENTS).filter(([, c]) => c.g === group).map(([id, c]) =>
+            `<div class="pal" draggable="true" tabindex="0" role="button" data-id="${id}" data-search="${escapeHtml((c.n + ' ' + group).toLowerCase())}"><span>${c.n}</span><a class="gl" href="${guidanceUrl(id)}" target="_blank" rel="noopener" draggable="false" title="Design System guidance for ${c.n}" aria-label="Guidance for ${c.n} (opens in new tab)">?</a></div>`).join('');
+        return `<section class="pal-group"><h2>${group}</h2>${items}</section>`;
+    }).join('');
+    $('#pal').innerHTML = `
+        <label class="f" for="pal-search" style="margin-top:0">Search components</label>
+        <input class="fld" id="pal-search" type="search" placeholder="For example: radios or HMRC" autocomplete="off">
+        <p class="hint" id="pal-empty" hidden>No components match your search.</p>
+        <p class="hint">Drag onto the page, or press Enter on a component.</p>
+        ${sections}`;
+}
+
+// Show only the components whose name or group contains every word typed.
+function filterPalette(query) {
+    const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    document.querySelectorAll('.pal-group').forEach(group => {
+        let visible = 0;
+        group.querySelectorAll('.pal').forEach(item => {
+            const match = words.every(word => item.dataset.search.includes(word));
+            item.hidden = !match;
+            if (match) visible++;
+        });
+        group.hidden = visible === 0;
+        shown += visible;
+    });
+    $('#pal-empty').hidden = shown !== 0;
+}
+
+document.addEventListener('input', ev => {
+    if (ev.target.id === 'pal-search') filterPalette(ev.target.value);
+});
+
+// Enter in the search box adds the first match, so the palette can be used from the keyboard.
+document.addEventListener('keydown', ev => {
+    if (ev.key !== 'Enter' || ev.target.id !== 'pal-search') return;
+    const first = document.querySelector('.pal:not([hidden])');
+    if (first) addComponent(first.dataset.id);
+});
+
+function renderCanvas() { $('#page').innerHTML = state.items.length ? state.items.map((it, i) => `<div class="it${i === state.sel ? ' sel' : ''}" draggable="true" tabindex="0" data-i="${i}"><div class="pv">${COMPONENTS[it.t].h(it.p)}</div></div>`).join('') : '<div class="empty">Drag a component here to start your page</div>'; }
+
+const indent = s => s.split('\n').map(l => l ? '    ' + l : l).join('\n');
+
+const hasForm = its => its.some(i => COMPONENTS[i.t].f || i.t === 'button');
+
+const isForm = () => hasForm(state.items);
+
+const splitPairs = s => splitLines(s).map(x => { const [a, ...b] = x.split('|'); return [a.trim(), b.join('|').trim()]; });
+
+const formGroup = (l, n, h, inner) => `<div class="govuk-form-group">${labelHtml(l, n)}${hintHtml(h, n)}${inner}</div>`;
+
+const pageNumbers = p => { const n = Math.min(Math.max(+p.total || 1, 1), 10); return [n, Math.min(Math.max(+p.current || 1, 1), n)]; };
+
+const BLOCK_ORDER = ['skipLink', 'bodyStart', 'header', 'beforeContent', 'content', 'footer'];
+
+const blockOf = i => COMPONENTS[i.t].blk || 'content';
+
+const nunjucksFor = i => `{# ${COMPONENTS[i.t].n}: ${guidanceUrl(i.t)} #}\n` + (COMPONENTS[i.t].j || COMPONENTS[i.t].h)(i.p);
+
+// ---------- Code generators (Nunjucks, HTML and routes tabs) ----------
+function generateNunjucks() {
+    const m = [...new Set(state.items.filter(i => COMPONENTS[i.t].m).map(i => COMPONENTS[i.t].m.join('|')))];
+    const imp = m.map(x => { const [a, b, lib = 'govuk'] = x.split('|'); return `{% from "${lib}/components/${b}/macro.njk" import ${a} %}`; }).join('\n');
+    let out = `{% extends "layouts/main.html" %}\n\n${imp ? imp + '\n\n' : ''}{% block pageTitle %}\n  ${state.title}\n{% endblock %}\n\n`;
+    BLOCK_ORDER.forEach(b => {
+        const l = state.items.filter(i => blockOf(i) === b);
+        if (!l.length)
+            return;
+        const body = l.map(nunjucksFor).join('\n\n');
+        if (b === 'content') {
+            const inner = isForm() ? `<form method="post" novalidate>\n${indent(body)}\n</form>` : body;
+            out += `{% block content %}\n<div class="govuk-grid-row">\n  <div class="govuk-grid-column-two-thirds">\n${indent(inner)}\n  </div>\n</div>\n{% endblock %}\n\n`;
+        }
+        else
+            out += `{% block ${b} %}\n${indent(body)}\n{% endblock %}\n\n`;
+    });
+    return out.trimEnd() + '\n';
+}
+
+function generateHtml() {
+    const g = b => state.items.filter(i => blockOf(i) === b).map(i => COMPONENTS[i.t].h(i.p)).join('\n\n');
+    return BLOCK_ORDER.map(b => { const t = g(b); if (!t)
+        return ''; if (b !== 'content')
+        return t + '\n\n'; const inner = isForm() ? `<form method="post" novalidate>\n${indent(t)}\n</form>` : t; return `<div class="govuk-grid-row">\n  <div class="govuk-grid-column-two-thirds">\n${indent(inner)}\n  </div>\n</div>\n\n`; }).join('').trimEnd() + '\n';
+}
+
+const guidanceUrl = t => { const c = COMPONENTS[t]; if (c.u) return c.u; return 'https://design-system.service.gov.uk/' + (c.m ? 'components/' + (c.m[1] === 'input' ? 'text-input' : c.m[1]) : 'styles/' + (t === 'heading' ? 'headings' : 'paragraphs')) + '/'; };
+
+function renderSidebar() {
+    document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', t.dataset.t === state.tab));
+    const sb = $('#sb');
+    if (state.tab === 'p')
+        return renderProperties(sb);
+    if (state.tab === 'x')
+        return renderExport(sb);
+    renderCode(sb);
+}
+
+function renderCode(sb) {
+    const txt = state.tab === 'n' ? generateNunjucks() : state.tab === 'r' ? generateRoutes() : generateHtml();
+    if (!sb.querySelector('#out')) {
+        sb.innerHTML = `<label class="f" style="margin-top:0" for="out">${state.tab === 'n' ? 'Save as app/views/' + state.pages[state.cur].name + '.html' : state.tab === 'r' ? 'Add to app/routes.js' : 'Plain HTML for the page body'}</label><textarea id="out" readonly></textarea><div class="row"><button class="btn" id="cp">Copy to clipboard</button><span class="hint" id="cm" role="status"></span></div>`;
+        $('#cp').onclick = async () => { const o = $('#out'); try {
+            await navigator.clipboard.writeText(o.value);
+            $('#cm').textContent = 'Copied';
+        }
+        catch (_) {
+            o.select();
+            try {
+                document.execCommand('copy');
+                $('#cm').textContent = 'Copied';
+            }
+            catch (__) {
+                $('#cm').textContent = 'Select the text and copy it';
+            }
+        } };
+    }
+    $('#out').value = txt;
+}
+
+function renderProperties(sb) {
+    const it = state.items[state.sel];
+    let h = pageSettingsHtml();
+    if (!it) {
+        sb.innerHTML = h + `<p class="hint" style="margin-top:16px">Select a component on the page to edit its content.</p>`;
+        $('#pt').oninput = ev => setPageTitle(ev.target.value);
+        return;
+    }
+    h += `<h2 style="margin-top:20px">${COMPONENTS[it.t].n}</h2><p><a class="gdl" href="${guidanceUrl(it.t)}" target="_blank" rel="noopener">Read the ${COMPONENTS[it.t].n} guidance on the GOV.UK Design System (opens in new tab)</a></p>`;
+    COMPONENTS[it.t].p.forEach(([k, l, , ty]) => { h += `<label class="f" for="p-${k}">${l}</label>` + (Array.isArray(ty) ? `<select class="fld" id="p-${k}" data-k="${k}">${ty.map(o => `<option${it.p[k] === o ? ' selected' : ''}>${o}</option>`).join('')}</select>` : ty === 'area' ? `<textarea class="fld" rows="4" id="p-${k}" data-k="${k}">${escapeHtml(it.p[k])}</textarea>` : `<input class="fld" id="p-${k}" data-k="${k}" value="${escapeHtml(it.p[k])}">`); });
+    h += `<div class="row"><button class="btn s" data-a="up">Move up</button><button class="btn s" data-a="down">Move down</button><button class="btn s" data-a="dup">Duplicate</button><button class="btn d" data-a="del">Delete</button></div>`;
+    sb.innerHTML = h;
+    $('#pt').oninput = ev => setPageTitle(ev.target.value);
+}
+
+function renderAll() { renderCanvas(); renderSidebar(); renderPageBar(); renderFlow(); renderPreview(); saveState(); }
+
+// ---------- Editing and drag-and-drop ----------
+function addComponent(id, at) { const it = createItem(id); const i = at == null ? state.items.length : at; state.items.splice(i, 0, it); state.sel = i; state.tab = 'p'; renderAll(); }
+
+function dropIndexAt(y) { const els = [...document.querySelectorAll('.it')]; let n = 0; els.forEach(el => { const r = el.getBoundingClientRect(); if (y > r.top + r.height / 2)
+    n++; }); return n; }
+
+function clearDropIndicators() { document.querySelectorAll('.dropb').forEach(x => x.classList.remove('dropb')); $('#cv').classList.remove('drope'); }
+document.addEventListener('dragstart', ev => {
+    const p = ev.target.closest && ev.target.closest('.pal'), i = ev.target.closest && ev.target.closest('.it');
+    if (p)
+        ev.dataTransfer.setData('text/plain', 'new:' + p.dataset.id);
+    else if (i)
+        ev.dataTransfer.setData('text/plain', 'mv:' + i.dataset.i);
+    ev.dataTransfer.effectAllowed = 'copyMove';
+});
+
+const canvasElement = $('#cv');
+canvasElement.addEventListener('dragover', ev => { ev.preventDefault(); clearDropIndicators(); const n = dropIndexAt(ev.clientY), els = document.querySelectorAll('.it'); if (n < els.length)
+    els[n].classList.add('dropb');
+else
+    canvasElement.classList.add('drope'); });
+canvasElement.addEventListener('dragleave', ev => { if (!canvasElement.contains(ev.relatedTarget))
+    clearDropIndicators(); });
+canvasElement.addEventListener('drop', ev => {
+    ev.preventDefault();
+    const n = dropIndexAt(ev.clientY);
+    clearDropIndicators();
+    const d = ev.dataTransfer.getData('text/plain');
+    if (d.startsWith('new:'))
+        addComponent(d.slice(4), n);
+    else if (d.startsWith('mv:')) {
+        const f = +d.slice(3), [it] = state.items.splice(f, 1);
+        const to = n > f ? n - 1 : n;
+        state.items.splice(to, 0, it);
+        state.sel = to;
+        renderAll();
+    }
+});
+document.addEventListener('dragend', clearDropIndicators);
+document.addEventListener('click', ev => {
+    if (ev.target.closest('a'))
+        return;
+    if (handlePageClick(ev))
+        return;
+    const p = ev.target.closest('.pal');
+    if (p)
+        return addComponent(p.dataset.id);
+    const i = ev.target.closest('.it');
+    if (i) {
+        state.sel = +i.dataset.i;
+        state.tab = 'p';
+        return renderAll();
+    }
+    const t = ev.target.closest('.tab');
+    if (t) {
+        state.tab = t.dataset.t;
+        $('#sb').innerHTML = '';
+        return renderSidebar();
+    }
+    const a = ev.target.closest('[data-a]');
+    if (a) {
+        const s = state.sel, I = state.items;
+        if (a.dataset.a === 'del') {
+            I.splice(s, 1);
+            state.sel = null;
+        }
+        if (a.dataset.a === 'dup') {
+            I.splice(s + 1, 0, JSON.parse(JSON.stringify(I[s])));
+            state.sel = s + 1;
+        }
+        if (a.dataset.a === 'up' && s > 0) {
+            [I[s - 1], I[s]] = [I[s], I[s - 1]];
+            state.sel = s - 1;
+        }
+        if (a.dataset.a === 'down' && s < I.length - 1) {
+            [I[s + 1], I[s]] = [I[s], I[s + 1]];
+            state.sel = s + 1;
+        }
+        renderAll();
+    }
+});
+document.addEventListener('keydown', ev => { if (ev.key !== 'Enter' || ev.target.closest('a'))
+    return; const p = ev.target.closest && ev.target.closest('.pal'); if (p)
+    addComponent(p.dataset.id); const i = ev.target.closest && ev.target.closest('.it'); if (i) {
+    state.sel = +i.dataset.i;
+    state.tab = 'p';
+    renderAll();
+} });
+document.addEventListener('input', ev => { const k = ev.target.dataset && ev.target.dataset.k; if (!k || state.sel == null)
+    return; state.items[state.sel].p[k] = ev.target.value; renderCanvas(); saveState(); });
+
+function renderPageBar() {
+    const view = state.view || 'page';
+    const toggle = [['page', 'Editor'], ['flow', 'Flow'], ['preview', 'Preview']].map(([v, label]) =>
+        `<button class="pg seg${view === v ? ' on' : ''}" data-view="${v}">${label}</button>`).join('');
+    const pageButtons = state.pages.map((p, i) =>
+        `<button class="pg${i === state.cur ? ' on' : ''}" data-pi="${i}">${escapeHtml(p.name)}</button>`).join('');
+    const extras = {
+        page: pageButtons + '<button class="pg add" data-add="1">+ Add page</button>',
+        flow: '<button class="pg add" data-add="1">+ Add screen</button><button class="pg" data-tidy="1">Tidy up</button>',
+        preview: ''
+    };
+    $('#bar').innerHTML = toggle + extras[view];
+}
+
+// The route and file name follow the page title, and stay unique across pages.
+function uniqueName(base, page) {
+    const taken = new Set(state.pages.filter(p => p !== page).map(p => p.name));
+    let name = base, n = 2;
+    while (taken.has(name))
+        name = base + '-' + n++;
+    return name;
+}
+
+function setPageTitle(value) {
+    const page = state.pages[state.cur];
+    state.title = value;
+    page.name = uniqueName(slugify(value) || 'page', page);
+    $('#namehint').textContent = '/' + page.name;
+    saveState();
+    renderPageBar();
+    renderFlow();
+}
+
+function goPage(i) { saveState(); state.cur = i; state.items = state.pages[i].items; state.title = state.pages[i].title; state.sel = null; $('#sb').innerHTML = ''; renderAll(); }
+
+function addPage() { saveState(); const n = state.pages.length + 1; state.pages.push({
+    id: 'p' + Date.now().toString(36),
+    name: 'page-' + n,
+    title: 'Page ' + n,
+    items: [],
+    next: '',
+    branch: {}
+}); state.tab = 'p'; goPage(state.pages.length - 1); }
+
+function delPage() { if (state.pages.length < 2)
+    return; const id = state.pages[state.cur].id; state.pages.splice(state.cur, 1); state.pages.forEach(p => { if (p.next === id)
+    p.next = ''; for (const k in p.branch || {})
+    if (p.branch[k] === id)
+        delete p.branch[k]; }); state.cur = Math.max(0, state.cur - 1); state.items = state.pages[state.cur].items; state.title = state.pages[state.cur].title; state.sel = null; $('#sb').innerHTML = ''; renderAll(); }
+
+function handlePageClick(ev) { if (ev.target.closest('[data-pi]')) {
+    goPage(+ev.target.closest('[data-pi]').dataset.pi);
+    return 1;
+} if (ev.target.closest('[data-add]')) {
+    addPage();
+    return 1;
+} if (ev.target.closest('[data-delpage]')) {
+    delPage();
+    return 1;
+} }
+
+function pageSettingsHtml() {
+    const P = state.pages[state.cur];
+    P.branch = P.branch || {};
+    const opts = (v, f) => `<option value="">${f}</option>` + state.pages.filter(x => x !== P).map(x => `<option value="${x.id}"${v === x.id ? ' selected' : ''}>/${escapeHtml(x.name)}</option>`).join('');
+    let h = `<h2>Page settings</h2><label class="f" for="pt">Page title</label><input class="fld" id="pt" value="${escapeHtml(state.title)}"><p class="hint" style="margin:4px 0 0">Route and file name: <code id="namehint">/${escapeHtml(P.name)}</code></p><label class="f" for="nx">After the form is submitted, go to</label><select class="fld" data-pg="next" id="nx">${opts(P.next, 'Stay on this page')}</select>`;
+    let n = 0;
+    state.items.filter(i => i.t === 'radios').forEach(r => splitLines(r.p.options).forEach(o => { const k = r.p.name + '=' + slugify(o); h += `<label class="f" for="br${++n}">${escapeHtml(r.p.legend)}: if answer is ${escapeHtml(o)}, go to</label><select class="fld" data-pg="br:${escapeHtml(k)}" id="br${n}">${opts(P.branch[k], 'Use the default above')}</select>`; }));
+    return h + `<div class="row"><button class="btn s" data-delpage="1"${state.pages.length < 2 ? ' disabled' : ''}>Delete this page</button></div><hr style="border:0;border-top:1px solid var(--ln);margin:16px 0">`;
+}
+
+function generateRoutes() {
+    const nm = id => { const x = state.pages.find(p => p.id === id); return x && x.name; };
+    let o = `// Pages without forms need no route: the kit serves app/views/<name>.html automatically.\nconst govukPrototypeKit = require('govuk-prototype-kit')\nconst router = govukPrototypeKit.requests.setupRouter()\n`, n = 0;
+    state.pages.forEach(P => {
+        if (!hasForm(P.items))
+            return;
+        n++;
+        const br = P.branch || {}, rules = [];
+        P.items.filter(i => i.t === 'radios').forEach(r => splitLines(r.p.options).forEach(x => { const t = nm(br[r.p.name + '=' + slugify(x)]); if (t)
+            rules.push(`  if (req.session.data[${quote(r.p.name)}] === ${quote(slugify(x))}) {\n    return res.redirect('/${t}')\n  }\n`); }));
+        o += `\n// ${P.title}\nrouter.post('/${P.name}', function (req, res) {\n${rules.join('')}  res.redirect('/${nm(P.next) || P.name}')\n})\n`;
+    });
+    if (!n)
+        o += `\n// Add a button or form field to a page to generate its POST route.\n`;
+    return o;
+}
+document.addEventListener('input', ev => {
+    const k = ev.target.dataset && ev.target.dataset.pg;
+    if (!k)
+        return;
+    const P = state.pages[state.cur];
+    if (k === 'next')
+        P.next = ev.target.value;
+    else if (k.startsWith('br:')) {
+        P.branch = P.branch || {};
+        P.branch[k.slice(3)] = ev.target.value;
+    }
+    saveState();
+    renderPageBar();
+    renderFlow();
+});
+renderPalette();
+renderAll();
+
+  </script>
 </body>
 </html>
